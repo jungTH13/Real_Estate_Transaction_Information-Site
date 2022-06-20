@@ -93,7 +93,6 @@
     methods:{
       async onScroll(){
         let target=document.getElementById('dealListBox');
-        console.log("first:",target.scrollHeight-300,"<",target.clientHeight+target.scrollTop)
         
         if(target.scrollHeight-300<target.clientHeight+target.scrollTop){
             if(this.visibleDealsIndex.length>this.searchDealList.length){

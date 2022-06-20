@@ -21,7 +21,7 @@ passportConfig();
 db_controller.start()
 .then(async (result)=>{
     console.log("데이터 베이스 연동 성공");
-    if(true){
+    if(false){
         db_controller.update(db)
         .then(res=>{
             if(res.state){

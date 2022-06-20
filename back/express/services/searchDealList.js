@@ -24,8 +24,9 @@ const searchRecentDeal = async(coordinate)=>{
             }
         })
         await Promise.all(promises);
-        
-        return result;
+        let res = RESPONSE.SUCCESS;
+        res.data=result;
+        return res;
 
     } catch(error){
         return RESPONSE.tryCatchError(error,RESPONSE.DB_SELECT_ERROR)

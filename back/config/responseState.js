@@ -108,5 +108,22 @@ module.exports={
         state:false,
         code:4401,
         message:"요청한 테이블이 존재하지 않습니다."
+    },
+
+
+    VALIDATE_ERROR:{
+        state:false,
+        code:5000,
+
+    },
+    VALIDATE_UNDIFINED_ERROR:{
+        state:false,
+        code:5001,
+        message:"변수가 정의되어 있지 않습니다."
+    },
+    VALIDATE_TYPE_ERROR:{
+        state:false,
+        code:5002,
+        message:"변수의 타입이 일치하지 않습니다."
     }
 }

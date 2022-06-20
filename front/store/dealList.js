@@ -65,6 +65,7 @@ export const state = () => ({
         })
         .catch((error)=>{
             console.error(error);
+            commit('setMapState',payload);
         })
     },
     setMapState({commit},payload){

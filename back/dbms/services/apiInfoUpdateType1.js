@@ -14,10 +14,15 @@ exports.setDEAL_YMD=(start)=> new Promise(res=>{ //params.DEAL_YMD 타입을 맞
 
 exports.addYMD=(start)=>new Promise(res=>{
     if(start.Month+1>12){
-        start.Year++;
-        start.Month=1;
+        res({
+            Year:start.Year+1,
+            Month:1,
+        })
     }else{
-        start.Month++;
+        res({
+            Year:start.Year,
+            Month:start.Month+1,
+        })
     }
     res(start);
 })
