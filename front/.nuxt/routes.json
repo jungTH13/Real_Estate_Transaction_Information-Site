@@ -2,22 +2,22 @@
   {
     "name": "map",
     "path": "/map",
-    "component": "C:\\\\Users\\\\infin\\\\Desktop\\\\node\\\\test\\\\pages\\\\map.vue",
+    "component": "C:\\\\Users\\\\infin\\\\Desktop\\\\node\\\\project\\\\front\\\\pages\\\\map.vue",
     "chunkName": "pages/map",
-    "_name": "_1afdae35"
+    "_name": "_6356595a"
   },
   {
     "name": "test",
     "path": "/test",
-    "component": "C:\\\\Users\\\\infin\\\\Desktop\\\\node\\\\test\\\\pages\\\\test.vue",
+    "component": "C:\\\\Users\\\\infin\\\\Desktop\\\\node\\\\project\\\\front\\\\pages\\\\test.vue",
     "chunkName": "pages/test",
-    "_name": "_0f5cfbee"
+    "_name": "_a041feaa"
   },
   {
     "name": "index",
     "path": "/",
-    "component": "C:\\\\Users\\\\infin\\\\Desktop\\\\node\\\\test\\\\pages\\\\index.vue",
+    "component": "C:\\\\Users\\\\infin\\\\Desktop\\\\node\\\\project\\\\front\\\\pages\\\\index.vue",
     "chunkName": "pages/index",
-    "_name": "_2ab47a6b"
+    "_name": "_64d6d009"
   }
 ]

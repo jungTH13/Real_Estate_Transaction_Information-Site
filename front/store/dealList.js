@@ -1,5 +1,7 @@
 export const state = () => ({
     dealList: [],
+    visibleDealsIndex:[],
+    visible:[],
     mapState: null,
     options:{
       date:{
@@ -15,6 +17,7 @@ export const state = () => ({
       AMOUNTMAX:500000,
     },
     refreshMarker:true,
+    refreshList:true,
   });
   
   export const mutations = {
@@ -41,8 +44,14 @@ export const state = () => ({
     setAmount(state,amount){
       state.options.amount=amount;
       state.refreshMarker=!state.refreshMarker;
+    },
+    refreshList(state,payload){
+      state.refreshList=!state.refreshList;
+    },
+    setVisibleDealsIndex(state,payload){
+      state.visibleDealsIndex.splice(0);
+      state.visibleDealsIndex=payload;
     }
-    
   };
 
   export const actions = {
@@ -69,5 +78,11 @@ export const state = () => ({
     },
     setAmount({commit},payload){
       commit('setAmount',payload);
+    },
+    refreshList({commit},payload){
+      commit('refreshList',payload);
+    },
+    setVisibleDealsIndex({commit},payload){
+      commit('setVisibleDealsIndex',payload);
     }
   }

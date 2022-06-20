@@ -2,7 +2,7 @@
   <div class="invisible">
     <v-navigation-drawer v-model="drawer" :mini-variant.sync="search" permanent class="searchList" id="box">
 
-      <v-list-item class="searchTitle" style="padding:0px 8px 0px 8px">
+      <v-list-item class="searchTitle" style="padding:0px 10px 0px 10px">
         <v-btn icon hide-details @click.stop="search = !search" >
             <v-icon hide-details>mdi-tune-variant</v-icon>
         </v-btn>

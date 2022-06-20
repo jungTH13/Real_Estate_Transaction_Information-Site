@@ -30,6 +30,9 @@ export default {
         },
         refreshMarker(){
             return this.$store.state.dealList.refreshMarker;
+        },
+        refreshList(){
+          return this.$store.state.dealList.refreshList;
         }
     },
     watch:{
@@ -78,23 +81,21 @@ export default {
             }
             return result
         },
-        setMarker(dealList,options=null){
-            dealList.forEach(async(deal)=>{
+        async setMarker(dealList,options=null){
+            let visibleList=[];
+            const promises=dealList.map((deal, index)=>{
                 if(options){
-                    if(!options.type[deal.house_type]){
+                    if( (!options.type[deal.house_type]) ||
+                        (options.date.min[0]>deal.deal_year||(options.date.min[0]==deal.deal_year&&options.date.min[1]>deal.deal_month)) ||
+                        (options.date.max[0]<deal.deal_year||(options.date.max[0]==deal.deal_year&&options.date.max[1]<deal.deal_month)) ||
+                        (options.amount[0]>deal.deal_amount||(options.amount[1]!=options.AMOUNTMAX&&options.amount[1]<deal.deal_amount))
+                    ){
+                        deal.visible=false;
                         return;
-                    }
-                    if(options.date.min[0]>deal.deal_year||(options.date.min[0]==deal.deal_year&&options.date.min[1]>deal.deal_month)){
-                        return;
-                    }
-                    if(options.date.max[0]<deal.deal_year||(options.date.max[0]==deal.deal_year&&options.date.max[1]<deal.deal_month)){
-                        return;
-                    }
-                    if(options.amount[0]>deal.deal_amount||(options.amount[1]!=options.AMOUNTMAX&&options.amount[1]<deal.deal_amount)){
-                        return;
-                    }
-
+                    }                    
                 }
+                visibleList.push(index);
+                deal.visible=true;
                 let contentText = `
                         <div class="marker" alt="">
                         <div style="font-size:10px; margin:0px">
@@ -118,7 +119,15 @@ export default {
                 }
                 }));
             })
-            console.log(this.markers.length)
+
+            Promise.all(promises)
+            .then(()=>{
+                this.$store.dispatch('dealList/setVisibleDealsIndex',visibleList);
+                this.$store.dispatch('dealList/refreshList');
+                console.log(this.markers.length)
+            });
+            
+            
         },
         removeMarker(){
             this.markers.forEach((marker)=>{
