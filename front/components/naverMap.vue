@@ -44,6 +44,7 @@ export default {
         },
         dealList(newVal,oldVal){
             console.log(this.options);
+            console.log(this.map.getCenter());
             this.setMarker(newVal,this.options);
         },
         refreshMarker(newVal,oldVal){
@@ -174,15 +175,16 @@ export default {
                 }
                 return alert('Geocode Error, address:' + address);
                 }
-                var item = response.v2.addresses[0],
-                point = new naver.maps.Point(item.x, item.y);
-
                 if (response.v2.meta.totalCount === 0) {
                 return alert('No result.');
                 }
 
+                let item = response.v2.addresses[0];
+                console.log("searchAddress:",response.v2.addresses);
+                let point = new naver.maps.Point(item.x, item.y);
+
                 map.setCenter(point);
-                map.setZoom(15);
+                map.setZoom(17);
             });
         }
     },

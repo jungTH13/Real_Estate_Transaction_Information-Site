@@ -8,9 +8,11 @@
                 <GroupSet></GroupSet>
             </div>
         </div>
-        <v-card class="box">
-            
-        </v-card>
+
+        <div class="grafBox">
+            <Graph></Graph>
+        </div>
+        
         <nav class="navBar">
             <v-toolbar dark color="green">
                 <v-toolbar-title >
@@ -43,6 +45,7 @@
     import NaverMap from '~/components/NaverMap.vue'
     import SearchResult from '../components/searchResult.vue';
     import GroupSet from '../components/groupSet.vue';
+    import Graph from '~/components/graph.vue';
 
     export default {
         data(){
@@ -69,7 +72,8 @@
         components: {
             NaverMap,
             SearchResult,
-            GroupSet
+            GroupSet,
+            Graph
         },
         methods:{
             searchPlace(){
@@ -111,6 +115,14 @@ a{
     position:absolute;
     top: 100px;
     left: 10px;
+    z-index: 10000;
+    background-color: #ffffff00;
+    overflow-y: auto;
+}
+.grafBox{
+    position:absolute;
+    bottom: 50px;
+    right: 10px;
     z-index: 10000;
     background-color: #ffffff00;
     overflow-y: auto;

@@ -20,7 +20,9 @@
                   {'http-equiv':"X-UA-Compatible", content:"IE=edge"}
               ],
               script:[
-                  {type:"text/javascript",src:"https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=yrmv6xu634&submodules=geocoder",defer:true}
+                  {type:"text/javascript",src:"https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=yrmv6xu634&submodules=geocoder",defer:true},
+                  {src:"https://cdn.jsdelivr.net/npm/chart.js"}
+
               ],
           }
       }

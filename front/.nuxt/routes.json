@@ -3,21 +3,18 @@
     "name": "map",
     "path": "/map",
     "component": "C:\\\\Users\\\\infin\\\\Desktop\\\\node\\\\project\\\\front\\\\pages\\\\map.vue",
-    "chunkName": "pages/map",
-    "_name": "_6356595a"
+    "chunkName": "pages/map"
   },
   {
     "name": "test",
     "path": "/test",
     "component": "C:\\\\Users\\\\infin\\\\Desktop\\\\node\\\\project\\\\front\\\\pages\\\\test.vue",
-    "chunkName": "pages/test",
-    "_name": "_a041feaa"
+    "chunkName": "pages/test"
   },
   {
     "name": "index",
     "path": "/",
     "component": "C:\\\\Users\\\\infin\\\\Desktop\\\\node\\\\project\\\\front\\\\pages\\\\index.vue",
-    "chunkName": "pages/index",
-    "_name": "_64d6d009"
+    "chunkName": "pages/index"
   }
 ]
