@@ -2,7 +2,7 @@ const passport=require('passport');
 const localStrategy = require('passport-local');
 const bcrypt = require('bcrypt')
 
-const User=require('../../models/user');
+const UserRepository = require('../../infrastructure/database/repositories/UserRepositoryMysql');
 const RESPONSE = require('../responseState');
 
 module.exports=()=>{
@@ -11,9 +11,8 @@ module.exports=()=>{
         passwordField: 'password',
     }, async (email,password,done)=>{
         try{
-            const exUser = await User.findOne({
-                where:{email}
-            });
+            const userRepository = new UserRepository;
+            const exUser = await userRepository.findEmailOne(email);
 
             if(exUser){
                 const result = bcrypt.compare(password,exUser.password);

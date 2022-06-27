@@ -1,9 +1,8 @@
 const passport = require('passport')
-
-const User = require('../../models/user')
-
 const RESPONSE=require('../responseState')
 const local = require("./local")
+
+const UserRepository = require('../../infrastructure/database/repositories/UserRepositoryMysql');
 
 module.exports = ()=>{
     passport.serializeUser((user,done)=>{
@@ -11,9 +10,9 @@ module.exports = ()=>{
     });
 
     passport.deserializeUser((id,done)=>{
-        User.findOne({
-            where:{id}
-        })
+        const userRepository = new UserRepository;
+
+        userRepository.findIdOne(id)
         .then(user=>{
             done(null,user);
         })

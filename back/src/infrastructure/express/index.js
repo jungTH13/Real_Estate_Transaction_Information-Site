@@ -2,8 +2,8 @@ const express = require('express');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
-//const passport  = require('passport');
-//const passportConfig = require('../../config/passport');
+const passport  = require('passport');
+const passportConfig = require('../../config/passport');
 const cors = require('cors');
 const dotenv = require('dotenv')
 
@@ -14,7 +14,7 @@ dotenv.config();
 
 module.exports= async (port=7000)=>{
     
-    //passportConfig();
+    passportConfig();
 
     app.set('port',port);
 
@@ -40,8 +40,8 @@ module.exports= async (port=7000)=>{
             },
             name:"session-cookie",
     }));
-    //app.use(passport.initialize());
-    //app.use(passport.session());
+    app.use(passport.initialize());
+    app.use(passport.session());
 
     app.use('/',dealRouter);
 
