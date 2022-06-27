@@ -1,11 +1,11 @@
 {
-  "name": "project",
-  "version": "0.0.1",
+  "name": "toy_project",
+  "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "index.js",
   "scripts": {
     "test": "jest",
-    "start": "nodemon app"
+    "start": "nodemon index"
   },
   "author": "TH13",
   "license": "MIT",
@@ -15,7 +15,6 @@
   "dependencies": {
     "axios": "^0.27.2",
     "bcrypt": "^5.0.1",
-    "chalk": "^5.0.1",
     "cookie-parser": "^1.4.6",
     "cookieparser": "^0.1.0",
     "cors": "^2.8.5",
