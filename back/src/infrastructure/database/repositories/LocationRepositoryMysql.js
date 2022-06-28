@@ -4,9 +4,9 @@ const {Op}=require('sequelize');
 const LocationRepository = require('../../../application/interface/LocationRepository')
 
 module.exports = class extends LocationRepository{
-    constructor(){
+    constructor(database=db){
         super();
-        this.model=db.Location;
+        this.model=database.Location;
     }
 
     async findAll(){

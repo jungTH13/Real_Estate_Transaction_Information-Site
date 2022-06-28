@@ -7,9 +7,9 @@ const config = require('../../../config/config.json')[env];
 const LocationFormrepository = require('../../../application/interface/LocationFormRepository')
 
 module.exports = class extends LocationFormrepository{
-    constructor(){
+    constructor(database=db){
         super();
-        this.models = db.LocationForm;
+        this.models = database.LocationForm;
     }
 
     async insertDeals(deals,sgg_cd){
@@ -32,8 +32,8 @@ module.exports = class extends LocationFormrepository{
         })
     }
 
-    async findAll(ormOptions,ssg_cd){
-        return await this.models[ssg_cd].findAll(ormOptions);
+    async findAll(ssg_cd){
+        return await this.models[ssg_cd].findAll();
     }
 
     async findOne(ormOptions,sgg_cd){

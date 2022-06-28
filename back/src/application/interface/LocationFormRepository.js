@@ -10,7 +10,7 @@ module.exports = class {
         throw new Error('ERR_METHOD_NOT_IMPLEMENTED');
     }
 
-    async findAll(ormOptions,ssg_cd){
+    async findAll(ssg_cd){
         throw new Error('ERR_METHOD_NOT_IMPLEMENTED');
     }
 
