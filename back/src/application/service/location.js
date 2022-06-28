@@ -15,4 +15,12 @@ module.exports = class {
         }
         return result;
     }
+
+    async updateCoordinate(coordinate,sgg_cd){
+        return await this.repository.XYupdate(coordinate,sgg_cd);
+    }
+
+    async findAllinfo(){
+        return await this.repository.findAll();
+    }
 }
