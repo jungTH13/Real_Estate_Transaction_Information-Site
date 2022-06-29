@@ -6,8 +6,8 @@ const LocationFormRepository = require('../infrastructure/database/repositories/
 
 exports.basic=async (options)=>{
 
-    const locationService= new LocationService(new LocationRepository());
-    const locationFormService= new LocationFormService(new LocationFormRepository());
+    const locationService= new LocationService(options.locationRepository || new LocationRepository());
+    const locationFormService= new LocationFormService(options.locationFormRepository || new LocationFormRepository());
     const coordinate={
         min_x:options.body.bounds.min.x,
         min_y:options.body.bounds.min.y,
