@@ -1,57 +1,57 @@
-const Sequelize=require('sequelize');
+const Sequelize = require('sequelize');
 
-module.exports= class Location extends Sequelize.Model{
-    static init(sequelize){
+module.exports = class Location extends Sequelize.Model {
+    static init(sequelize) {
         return super.init({
-            location:{
+            location: {
                 type: Sequelize.STRING(20),
-                allowNull:false,
-            },  
-            sgg_cd:{
-                type: Sequelize.INTEGER,
-                allowNull:false,
+                allowNull: false
             },
-            sgg_nm:{
+            sgg_cd: {
+                type: Sequelize.INTEGER,
+                allowNull: false
+            },
+            sgg_nm: {
                 type: Sequelize.STRING(20),
-                allowNull: false,
+                allowNull: false
             },
-            url:{
-                type:Sequelize.INTEGER,
-                allowNull:false,
-            },
-            key_type:{
+            url: {
                 type: Sequelize.INTEGER,
-                allowNull:false
+                allowNull: false
             },
-            min_x:{
+            key_type: {
+                type: Sequelize.INTEGER,
+                allowNull: false
+            },
+            min_x: {
                 type: Sequelize.FLOAT,
-                allowNull:true,
+                allowNull: true
 
             },
-            min_y:{
+            min_y: {
                 type: Sequelize.FLOAT,
-                allowNull:true,
+                allowNull: true
 
             },
-            max_x:{
+            max_x: {
                 type: Sequelize.FLOAT,
-                allowNull:true,
+                allowNull: true
 
             },
-            max_y:{
+            max_y: {
                 type: Sequelize.FLOAT,
-                allowNull:true,
+                allowNull: true
 
-            },
+            }
 
-        },{
+        }, {
             sequelize,
-            timestamps:false,
-            underscored:false,
-            modelName:'Location',
-            tableName:'locations',
-            charset:'utf8',
-            collate:'utf8_general_ci',
+            timestamps: false,
+            underscored: false,
+            modelName: 'Location',
+            tableName: 'locations',
+            charset: 'utf8',
+            collate: 'utf8_general_ci'
         });
     }
 }

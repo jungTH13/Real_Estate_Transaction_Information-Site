@@ -1,23 +1,21 @@
 const db = require('../orm/sequelize/models');
-const RESPONSE = require('../../../config/responseState');
-const {Op}=require('sequelize');
 const UserRepository = require('../../../application/interface/UserRepository');
 
-module.exports = class extends UserRepository{
-    constructor(){
+module.exports = class extends UserRepository {
+    constructor() {
         super();
         this.model = db.User;
     }
 
-    findIdOne(id){
+    findIdOne(id) {
         return this.model.findOne({
-            where:{id}
+            where: { id }
         })
     }
 
-    findEmailOne(email){
+    findEmailOne(email) {
         return this.model.findOne({
-            where:{email}
+            where: { email }
         })
     }
 }

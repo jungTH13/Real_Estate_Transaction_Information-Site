@@ -1,10 +1,9 @@
-module.exports = class User{
-
-    async findIdOne(id){
+module.exports = class User {
+    async findIdOne(id) {
         throw new Error('ERR_METHOD_NOT_IMPLEMENTED');
     }
 
-    findEmailOne(email){
+    findEmailOne(email) {
         throw new Error('ERR_METHOD_NOT_IMPLEMENTED');
     }
 }
