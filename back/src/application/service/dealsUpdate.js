@@ -3,37 +3,13 @@ const {Op}=require('sequelize');
 
 module.exports=class dealUpdate {
     constructor(options){
-        this.Location = options.locationRepository;
         this.LocationForm = options.locationFormRepository;
         this.url = options.url;
         this.dealsApi = options.dealsApi;
         this.mapApi = options.mapApi;
     }
 
-    async update(){
-        try{
-            console.log("데이터베이스 실거래정보 업데이트 시작")
-            const Location=this.Location;
-            const LocationFormList=await Location.findAll({attributes:['sgg_cd']});
-            
-            for(let LocationFormName of LocationFormList){
-                let sgg_cd=LocationFormName.sgg_cd;
-                
-                await this.type1(sgg_cd)
-                .then(async res=>await RESPONSE.errorCheckAndraise(res));
-
-                await this.locationXYupdate(sgg_cd)
-                .then(async res=>await RESPONSE.errorCheckAndraise(res));
-            }
-            console.log("데이터베이스 실거래정보 업데이트 완료")
-            return RESPONSE.SUCCESS;
-    
-        }catch(error){
-            return RESPONSE.tryCatchError(error,RESPONSE.DB_API_SYNC_ERROR)
-        }
-    }
-
-    async type1 (sgg_cd){ //type1 에 대한 api 통신 및 테이블(sgg_cd)에 데이터 저장 함수
+    async update (sgg_cd){ //type1 에 대한 api 통신 및 테이블(sgg_cd)에 데이터 저장 함수
         const url = this.url;
         const LocationForm = this.LocationForm;
         let ACCESS_EXCEED=false;
@@ -84,36 +60,6 @@ module.exports=class dealUpdate {
 
     }
 
-
-    async locationXYupdate(sgg_cd){
-        try{
-            const LocationForm = this.LocationForm;
-            const Location = this.Location;
-
-            // const max_xInfo = await LocationForm.findOne({order:[['x','DESC']]},sgg_cd);
-            // const min_xInfo = await LocationForm.findOne({
-            //                                                 where:{x:{[Op.gt]:0}},
-            //                                                 order:[['x']]
-            //                                             },sgg_cd);
-            // const max_yInfo = await LocationForm.findOne({order:[['y','DESC']]},sgg_cd);
-            // const min_yInfo = await LocationForm.findOne({
-            //                                                 where:{y:{[Op.gt]:0}},
-            //                                                 order:[['y']]
-            //                                             },sgg_cd);
-            await Location.XYupdate({
-                min_x:await LocationForm.findMinOne('x',sgg_cd),
-                max_x:await LocationForm.findMaxOne('x',sgg_cd),
-                min_y:await LocationForm.findMinOne('y',sgg_cd),
-                max_y:await LocationForm.findMaxOne('y',sgg_cd),
-            },sgg_cd);
-        }catch(error){
-            return RESPONSE.tryCatchError(error,RESPONSE.DB_TABLE_UPDATE_ERROR);
-        }
-        
-        return RESPONSE.SUCCESS;
-    }
-
-
     //해당구의 코드번호와 갱신할 기간을 받아 해당 테이블의 실거래 정보를 업데이트한다.
     async insertDealdata (name,url,sgg_cd,start,end,check){
 
@@ -138,17 +84,9 @@ module.exports=class dealUpdate {
                                 await this.findCoordinate(await this.addressParse(name,data))
                                 .then(async res=>{
                                     if(res.state){
-                                        let set={};
-                                        if(name=='아파트'){
-                                            set.name='아파트',set.house_type='아파트';
-                                        }else if(name=='오피스텔'){
-                                            set.name='단지',set.house_type='오피스텔';
-                                        }else if(name == '연립다세대'){
-                                            set.name='연립다세대',set.house_type='연립다세대';
-                                        };
                                         deals.push({
                                             dong:data['법정동'],
-                                            name:data[set.name],
+                                            name:data['단지'] || data['연립다세대'] ||data['아파트'],
                                             jibun:data['지번'],
                                             deal_amount:parseInt(data['거래금액'].replace(/,/g , '')),
                                             build_year:data['건축년도'],
@@ -157,7 +95,7 @@ module.exports=class dealUpdate {
                                             deal_day:data['일'],
                                             area:data['전용면적'],
                                             floor:data['층'],
-                                            house_type:set.house_type,
+                                            house_type:name,
                                             cancel_deal_type:data['해제여부']=='O',
                                             cancel_deal_day:data['해제사유발생일'],
                                             req_gbn:data['거래유형'],

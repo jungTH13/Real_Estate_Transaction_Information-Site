@@ -3,7 +3,8 @@ const RESPONSE =require('../../../../config/responseState');
 exports.insertLocationFormTableInfo=async (Location,locations)=>{
     //location 테이블의 지역리스트 update
     try{
-        const promises = locations.map(async (L) => {
+        
+        for(L of locations){
             await Location.findOrCreate({
                 where: {sgg_cd : L.sgg_cd},
                 defaults:{
@@ -13,9 +14,7 @@ exports.insertLocationFormTableInfo=async (Location,locations)=>{
                     key_type: L.key_type,
                 }
             })
-        });
-
-        await Promise.all(promises);
+        }
 
         return RESPONSE.SUCCESS;
     } catch(error){

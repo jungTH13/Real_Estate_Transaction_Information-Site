@@ -1,7 +1,4 @@
-const {Op} = require('sequelize')
-const Sequelize = require('sequelize');
-const env = process.env.NODE_ENV || 'development';
-const config = require('../../config/config.json')[env];
+const CoordinateDomain = require('../../domain/coordinate');
 
 module.exports=class{
 
@@ -14,20 +11,20 @@ module.exports=class{
 
         let promises=locationList.map(async (info)=>{
             let ssg_cd=info.sgg_cd;
-            result = result.concat(await this.repository.findRecentlyDeals(coordinate,ssg_cd));
+            const deals = await this.repository.findRecentlyDeals(coordinate,ssg_cd)
+            result = result.concat(deals);
             
-            // await this.repository.findAll({
-            //     where:{
-            //         id:{[Op.in]:[Sequelize.literal(`select max(id) as id from`+` ${config.database}.${ssg_cd} `+`group by dong,name`)]},
-            //         x:{[Op.and]:[{[Op.gt]:coordinate.min_x},{[Op.lt]:coordinate.max_x}]},
-            //         y:{[Op.and]:[{[Op.gt]:coordinate.min_y},{[Op.lt]:coordinate.max_y}]}
-            //     },
-            //     raw:true
-            // },ssg_cd).then((res)=>{
-            //     result = result.concat(res);
-            // })
         })
         await Promise.all(promises);
         return result;
+    }
+
+    async findMaxMinCoordinate(sgg_cd){
+        const max_x = await this.repository.findMaxOne('x',sgg_cd);
+        const min_x = await this.repository.findMinOne('x',sgg_cd);
+        const max_y = await this.repository.findMaxOne('y',sgg_cd);
+        const min_y = await this.repository.findMinOne('y',sgg_cd);
+
+        return new CoordinateDomain(min_x.x,max_x.x,min_y.y,max_y.y);
     }
 }
