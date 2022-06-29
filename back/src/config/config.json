@@ -7,11 +7,11 @@
     "dialect": "mysql"
   },
   "test": {
-    "username": "root",
+    "username": "",
     "password": "",
-    "database": "database_test",
+    "database": "",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "sqlite"
   },
   "production": {
     "username": "root",

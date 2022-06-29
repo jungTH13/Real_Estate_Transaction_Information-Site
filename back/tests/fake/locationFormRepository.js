@@ -1,55 +1,26 @@
-const dealDomain = require('../../src/domain/deal');
-
-module.exports = class {
-
-    constructor(){
-        this.data=[];
-    }
-
-    async insertDeals(deals,sgg_cd){
-        this.data=this.data.concat(deals);
-    }
-
-    async deleteDeals(house_type,Year,Month,ssg_cd){
-        for(let i;i<this.data.length;i++){
-            let deal=data[i];
-            if(deal.hous_type==house_type&&deal.deal_year==Year&&deal.deal_month==Month){
-                this.data.splice(i,1);
-                i--;
-            }
+module.exports = {
+    findAll:()=>{
+        return [
+        {
+            max_x:126.982,
+            min_x:126.904,
+            max_y:37.5143,
+            min_y:37.4766,
+            sgg_cd:11590,
+        },
+        {
+            min_x: 126.947,
+            min_y: 37.517,
+            max_x: 127.015,
+            max_y: 37.5549,
+            sgg_cd:11170,
+        },
+        {
+            min_x: 126.881,
+            min_y: 37.5354,
+            max_x: 126.962,
+            max_y: 37.5871,
+            sgg_cd:11440,
         }
-    }
-
-    // async findAll(ormOptions,ssg_cd){
-
-    // }
-
-    // async findOne(ormOptions,sgg_cd){
-
-    // }
-
-    async findRecentlyDealOnType(house_type,sgg_cd){
-        return this.data.reduce((result,output)=>{
-            if(output.house_type==house_type&&output.deal_year>result.deal_year){
-            }else{
-                return result;
-            }
-        })
-    }
-
-    async findRecentlyDeals(coordinate,ssg_cd){
-
-    }
-
-    async findMaxOne(attribute,sgg_cd){
-        return 
-    }
-
-    async findMinOne(attribute,sgg_cd){
-        return 
-    }
-
-    async bulkCreate(deals,sgg_cd){
-        this.data=this.data.concat(deals);
-    }
-} 
+    ]}
+}

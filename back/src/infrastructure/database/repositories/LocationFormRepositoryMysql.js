@@ -52,7 +52,7 @@ module.exports = class extends LocationFormrepository{
         const table = this.models[ssg_cd];
         return await table.findAll({
             where:{
-                id:{[Op.in]:[Sequelize.literal(`select max(id) as id from`+` ${config.database}.${ssg_cd} `+`group by dong,name`)]},
+                id:{[Op.in]:[Sequelize.literal(`select max(id) as id from`+(config.dialect == 'sqlite'?` '${ssg_cd}' ` :` ${config.database}.${ssg_cd} `)+`group by dong,name`)]},
                 x:{[Op.and]:[{[Op.gt]:coordinate.min_x},{[Op.lt]:coordinate.max_x}]},
                 y:{[Op.and]:[{[Op.gt]:coordinate.min_y},{[Op.lt]:coordinate.max_y}]}
             },

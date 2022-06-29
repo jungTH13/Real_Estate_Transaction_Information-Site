@@ -11,8 +11,8 @@ const LocationFormRepository = require('../infrastructure/database/repositories/
 exports.update = async (options)=>{
     
     const dealsUpdateService = new DealsUpdateService(options);
-    const locationService= new LocationService(new LocationRepository());
-    const locationFormService= new LocationFormService(new LocationFormRepository());
+    const locationService= new LocationService(options.locationRepository || new LocationRepository());
+    const locationFormService= new LocationFormService(options.locationFormRepository || new LocationFormRepository());
     
     try{
         const locationList = await locationService.findAllinfo();

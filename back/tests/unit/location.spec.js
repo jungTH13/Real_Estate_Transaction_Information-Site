@@ -2,34 +2,11 @@ const LocationService = require('../../src/application/service/location');
 
 const CoordinateDomain = require('../../src/domain/coordinate');
 
+const fakeLocationRepository = require('../fake/LocationFormRepository');
+
 describe('findIncludeArea test',()=>{
-    const fakeRepository= {
-        findAll:()=>{
-            return [
-            {
-                max_x:126.982,
-                min_x:126.904,
-                max_y:37.5143,
-                min_y:37.4766,
-                sgg_cd:11590,
-            },
-            {
-                min_x: 126.947,
-                min_y: 37.517,
-                max_x: 127.015,
-                max_y: 37.5549,
-                sgg_cd:11170,
-            },
-            {
-                min_x: 126.881,
-                min_y: 37.5354,
-                max_x: 126.962,
-                max_y: 37.5871,
-                sgg_cd:11440,
-            }
-        ]}
-    }
-    const locationService= new LocationService(fakeRepository);
+    
+    const locationService= new LocationService(fakeLocationRepository);
 
     test('입력된 coordinate와 범위가 겹치는 정보를 반환 하는가',async ()=>{
         //given
