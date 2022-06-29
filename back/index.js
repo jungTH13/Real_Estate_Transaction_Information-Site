@@ -1,9 +1,8 @@
 const dotenv = require('dotenv');
 
 dotenv.config();
-process.env.NODE_ENV='test'
 
-const dealsUpdateController = require('./src/controllers/dealsupdateController');
+const dealsUpdateController = require('./src/controllers/dealsUpdateController');
 const db = require('./src/infrastructure/database/orm/sequelize/models');
 const expressServer = require('./src/infrastructure/express');
 const apiInfo = require('./src/config/apiInfo') 
