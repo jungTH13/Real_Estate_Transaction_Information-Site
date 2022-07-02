@@ -4,6 +4,8 @@ const LocationFormService = require('../application/service/locationForm');
 const LocationRepository = require('../infrastructure/database/repositories/LocationRepositoryMysql');
 const LocationFormRepository = require('../infrastructure/database/repositories/LocationFormRepositoryMysql')
 
+const RESPONSE = require('../config/responseState');
+
 exports.basic = async (options) => {
     const locationService = new LocationService(options.locationRepository || new LocationRepository());
     const locationFormService = new LocationFormService(options.locationFormRepository || new LocationFormRepository());
@@ -16,8 +18,8 @@ exports.basic = async (options) => {
 
     try {
         const locationList = await locationService.findIncluedArea(coordinate);
-        return await locationFormService.findRecentlyDealsDistinct(coordinate, locationList)
+        return await locationFormService.findRecentlyDealsDistinct(coordinate, locationList);
     } catch (error) {
-        console.log(error)
+        RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.CONTROLLER_ERROR_NAME('basic'))
     }
 }

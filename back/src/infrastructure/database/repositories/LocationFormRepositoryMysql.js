@@ -1,7 +1,6 @@
 const db = require('../orm/sequelize/models');
 const { Op } = require('sequelize');
 const Sequelize = require('sequelize');
-const RESPONSE = require('../../../config/responseState')
 const env = process.env.NODE_ENV || 'development';
 const config = require('../../../config/config.json')[env];
 const LocationFormrepository = require('../../../application/interface/LocationFormRepository')
@@ -13,23 +12,17 @@ module.exports = class extends LocationFormrepository {
     }
 
     async insertDeals(deals, sgg_cd) {
-        await this.models[sgg_cd].bulkCreate(deals)
-            .then(() => {
-                return RESPONSE.SUCCESS;
-            })
+        return await this.models[sgg_cd].bulkCreate(deals)
     }
 
     async deleteDeals(house_type, Year, Month, ssg_cd) {
-        await this.models[ssg_cd].destroy({
+        return await this.models[ssg_cd].destroy({
             where: {
                 house_type,
                 deal_year: Year,
                 deal_month: Month
             }
         })
-            .then(() => {
-                return RESPONSE.SUCCESS;
-            })
     }
 
     async findAll(ssg_cd) {

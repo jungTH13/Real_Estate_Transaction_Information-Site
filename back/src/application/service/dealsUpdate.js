@@ -1,4 +1,7 @@
 const RESPONSE = require('../../config/responseState');
+const { logger } = require('../../config/winston')
+const util = require('util')
+const DealDomain = require('../../domain/deal');
 
 module.exports = class dealUpdate {
     constructor(options) {
@@ -14,116 +17,90 @@ module.exports = class dealUpdate {
         let ACCESS_EXCEED = false;
         try {
             for (const name of url.name) {
-                // await LocationForm.findOne({// 가장 최근 업데이트 된 정보를 받아온다
-                //         where:{house_type: name},
-                //         order:[['deal_year','DESC'],['deal_month','DESC'],['deal_day','DESC']]
-                // },sgg_cd)
-                await LocationForm.findRecentlyDealOnType(name, sgg_cd)
-                    .then(async (search) => {
-                        const check = await this.startDateSetting(search, 0)
-                        const start = await this.startDateSetting(search);
-                        const end = {
-                            Year: new Date().getFullYear(),
-                            Month: new Date().getMonth() + 1
-                        };
+                const search = await LocationForm.findRecentlyDealOnType(name, sgg_cd)
 
-                        console.log(`'${sgg_cd}${name}'의 최신 거래정보: `, check, ` / '${await this.setDEAL_YMD(start)}'부터 갱신시작`)
+                const dateParams = await this.updateDateParamsSetting(search, 1);
+                logger.info(`'${sgg_cd}${name}'의 최신 거래정보: ` + util.format('%o', dateParams.check) + ` / '${await this.setDEAL_YMD(dateParams.start)}'부터 갱신시작`)
 
-                        await this.insertDealdata(name, url[name], sgg_cd, start, end, check)
-                            .then(res => {
-                                if (res.state) {
-                                    console.log(`'${sgg_cd}${name}' 갱신완료`)
-                                    return RESPONSE.SUCCESS;
-                                } else {
-                                    if (res.code === RESPONSE.API_ACCESS_DENIAL.code) {
-                                        ACCESS_EXCEED = true;
-                                        console.log(`'${name}'의 업데이트 강제종료`);
-                                    } else {
-                                        throw res
-                                    }
-                                }
-                            })
-                    })
-                    .catch(async (error) => {
-                        await RESPONSE.errorCheckAndraise(error);
-                    })
+                const res = await this.insertDealdata(name, url[name], sgg_cd, dateParams);
+
+                if (res.status) {
+                    logger.info(`'${sgg_cd}${name}' 갱신완료`);
+                    continue;
+                }
+                if (res.code === RESPONSE.API_ACCESS_DENIAL.code) {
+                    ACCESS_EXCEED = true;
+                    logger.warn(`'${sgg_cd}${name}'의 업데이트 강제종료`);
+                } else {
+                    console.log('***', res)
+                    throw res;
+                }
             }
+
             if (ACCESS_EXCEED) {
-                console.log({ warning: '호출횟수 초과로 일부 정보를 최신하지 못했습니다.' })
+                logger.warn('호출횟수 초과로 일부 정보를 최신하지 못했습니다.');
             }
             return RESPONSE.SUCCESS;
         } catch (error) {
-            return RESPONSE.tryCatchError(error, RESPONSE.DB_API_SYNC_ERROR)
+            RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.DB_API_SYNC_ERROR);
         }
     }
 
     // 해당구의 코드번호와 갱신할 기간을 받아 해당 테이블의 실거래 정보를 업데이트한다.
-    async insertDealdata(name, url, sgg_cd, start, end, check) {
+    async insertDealdata(name, url, sgg_cd, dateParams) {
+        let start = dateParams.start;
+        const check = dateParams.check;
+        const end = dateParams.end;
         const params = {
             serviceKey: process.env.LOCATION_API_KEY_TYPE1,
             LAWD_CD: sgg_cd,
             DEAL_YMD: null
         };
-
         try {
             while (end.Year > start.Year || (end.Year === start.Year && end.Month >= start.Month)) { // 현재 달까지의 모든 정보를 갱신
                 params.DEAL_YMD = await this.setDEAL_YMD(start);
-                await this.getProperty(url, params)
-                    .then(async res => {
-                        if (res.state) {
-                            if (res.data) {
-                                if (!Array.isArray(res.data)) {
-                                    res.data = [res.data];
-                                }
-                                const deals = [];
-                                for (const data of res.data) {
-                                    await this.findCoordinate(await this.addressParse(name, data))
-                                        .then(async res => {
-                                            if (res.state) {
-                                                deals.push({
-                                                    dong: data['법정동'],
-                                                    name: data['단지'] || data['연립다세대'] || data['아파트'],
-                                                    jibun: data['지번'],
-                                                    deal_amount: parseInt(data['거래금액'].replace(/,/g, '')),
-                                                    build_year: data['건축년도'],
-                                                    deal_year: data['년'],
-                                                    deal_month: data['월'],
-                                                    deal_day: data['일'],
-                                                    area: data['전용면적'],
-                                                    floor: data['층'],
-                                                    house_type: name,
-                                                    cancel_deal_type: data['해제여부'] === 'O',
-                                                    cancel_deal_day: data['해제사유발생일'],
-                                                    req_gbn: data['거래유형'],
-                                                    x: res.data.x,
-                                                    y: res.data.y
-                                                });
-                                            } else {
-                                                throw res;
-                                            }
-                                        })
-                                }
+                const deals = [];
 
-                                await this.dataInsertOrSwap(sgg_cd, name, start, check, deals);
-                                console.log({ processing: `'${sgg_cd}${name}': ${start.Year}.${start.Month} 완료` });
-                            }
-                        } else {
-                            throw res;
-                        }
-                    })
-                    .catch(err => {
-                        throw err;
-                    })
-                start = await this.addYM(start)
+                const res = await this.getProperty(url, params);
+                if (!res.status && res.code === RESPONSE.API_ACCESS_DENIAL.code) {
+                    return res;
+                }
+                if (!res.data) {
+                    res.data = [];
+                }
+                if (!Array.isArray(res.data)) {
+                    res.data = [res.data];
+                }
+
+                for (const data of res.data) {
+                    const res = await this.findCoordinate(await this.addressParse(name, data));
+
+                    deals.push(new DealDomain(data['법정동'], (data['단지'] || data['연립다세대'] || data['아파트']), data['지번'], parseInt(data['거래금액'].replace(/,/g, '')), data['건축년도'], data['년'], data['월'], data['일'], data['전용면적'], data['층'], name, (data['해제여부'] === 'O'), data['해제사유발생일'], data['거래유형'], res.data.x, res.data.y));
+                }
+                await this.dataInsertOrSwap(sgg_cd, name, start, check, deals);
+                logger.info(`'${sgg_cd}${name}': ${start.Year}.${start.Month} 완료`);
+
+                start = await this.addYM(start);
             }
             return RESPONSE.SUCCESS;
         } catch (error) {
-            return await RESPONSE.tryCatchError(error, RESPONSE.DB_API_SYNC_ERROR);
+            RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.DB_API_SYNC_ERROR);
         };
     };
 
+    updateDateParamsSetting = async (deal, set = 3) => {
+        return {
+            check: await this.DateSetting(deal, 0),
+            start: await this.DateSetting(deal, set),
+            end: {
+                Year: new Date().getFullYear(),
+                Month: new Date().getMonth() + 1
+            }
+        }
+    }
+
     // 실거래 신고를 최대 3개월까지 늦츨수 있기때문에 3개월전의 데이터부터 갱신하기 위한 날짜 설정
-    startDateSetting = (start, set = 1) => new Promise((resolve, reject) => { // 실거래 신고를 최대 3개월까지 늦츨수 있기때문에 3개월전의 데이터부터 갱신하기 위한 날짜 설정
+    DateSetting = (start, set = 0) => new Promise((resolve, reject) => { // 실거래 신고를 최대 3개월까지 늦츨수 있기때문에 3개월전의 데이터부터 갱신하기 위한 날짜 설정
         if (start) {
             const result = {}
             if (start.deal_month - set >= 1) {
@@ -134,44 +111,41 @@ module.exports = class dealUpdate {
                 result.Month = start.deal_month - set + 12;
             }
             resolve(result);
-        } else {
-            resolve({
-                Year: parseInt(process.env.SINCE_YEAR),
-                Month: parseInt(process.env.SINCE_MONTH)
-            });
         }
+
+        resolve({
+            Year: parseInt(process.env.SINCE_YEAR),
+            Month: parseInt(process.env.SINCE_MONTH)
+        });
     })
 
     // api 통신을 통해서 거래 정보를 가져온다
     async getProperty(url, params) {
         for (let i = 0; i < 10; i++) {
             const res = await this.dealsApi(url, params);
-            if (res.state) {
+            if (res.status) {
                 return res;
-            } else {
-                if (res.code === RESPONSE.API_ACCESS_DENIAL.code) {
-                    return res;
-                }
-                console.log({ warning: `Property데이터 수신 에러 재시도(${i + 1}/10)` });
-                if (i === 9) {
-                    return res;
-                }
+            }
+            if (res.code === RESPONSE.API_ACCESS_DENIAL.code) {
+                return res;
+            }
+            logger.warn(`Property데이터 수신 에러 재시도(${i + 1}/10)`);
+            if (i === 9) {
+                throw new Error('getProperty의 정상적인 데이터 수신에 실패했습니다.');
             }
         }
-        return res;
     }
 
     // api 통신틍 통해 각 거래정보의 위치정보를 가져온다.
     async findCoordinate(address) {
         for (let i = 0; i < 10; i++) {
             const res = await this.mapApi(address)
-            if (res.state) {
+            if (res.status) {
                 return res;
-            } else {
-                console.log({ warning: `map데이터 수신 에러 재시도(${i + 1}/10)` });
-                if (i === 9) {
-                    return res
-                }
+            }
+            logger.warn(`map데이터 수신 에러 재시도(${i + 1}/10)`);
+            if (i === 9) {
+                throw new Error('findCoordinate의 정상적인 데이터 수신에 실패했습니다.');
             }
         }
     }
