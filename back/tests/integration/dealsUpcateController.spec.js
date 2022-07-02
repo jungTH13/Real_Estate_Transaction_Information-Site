@@ -10,6 +10,8 @@ const testDb = require('../fake/database');
 const fakeMapApi = require('../fake/mapApi');
 const fakeDealsApi = require('../fake/dealsApi');
 
+process.env.NODE_ENV = 'test';
+
 describe('dealsUpcateController intgration module test', () => {
     const date = new Date();
     process.env.SINCE_YEAR = date.getFullYear();

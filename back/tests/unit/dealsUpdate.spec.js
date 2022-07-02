@@ -31,7 +31,7 @@ describe('dealsUpdate의 module test', () => {
     })
 
     test('최신 실거래 날짜를 기준으로 갱신 시작 월 재설정', async () => {
-        const target = dealUpdateService.startDateSetting;
+        const target = dealUpdateService.DateSetting;
         const params = {
             deal_year: 2021,
             deal_month: 6
@@ -119,7 +119,7 @@ describe('dealsUpdate의 module test', () => {
 describe('dealsUpdate의 mapApi module test', () => {
     test('api 통신 성공시 정상적인 반환값을 반환하는가', async () => {
         const result = {
-            state: true,
+            status: true,
             data: {
                 x: 0,
                 y: 0
@@ -136,7 +136,7 @@ describe('dealsUpdate의 mapApi module test', () => {
 
     test('api 통신 실패시 10회까지 재시도 후 결과값을 반환하는가', async () => {
         const result = {
-            state: false,
+            status: false,
             data: {
                 x: 0,
                 y: 0
@@ -152,7 +152,12 @@ describe('dealsUpdate의 mapApi module test', () => {
         const updateOptions = new UpdateOptionsDomain(null, null, null, null, mapApi);
         const dealUpdateService = new DealsUpdate(updateOptions);
 
-        expect(await dealUpdateService.findCoordinate('testcheck')).toEqual(result)
+        try {
+            await dealUpdateService.findCoordinate('testcheck')
+        } catch (error) {
+            expect(error).toStrictEqual(new Error('findCoordinate의 정상적인 데이터 수신에 실패했습니다.'));
+        }
+
         expect(count).toBe(10)
     })
 })
@@ -160,7 +165,7 @@ describe('dealsUpdate의 mapApi module test', () => {
 describe('dealsUpdate의 dealsApi module test', () => {
     test('api 통신 성공시 정상적인 반환값을 반환하는가', async () => {
         const result = {
-            state: true,
+            status: true,
             data: 'testcheck empty'
         }
         const dealsApi = async (url, params) => {
@@ -187,7 +192,11 @@ describe('dealsUpdate의 dealsApi module test', () => {
         const updateOptions = new UpdateOptionsDomain(null, null, null, dealsApi, null);
         const dealUpdateService = new DealsUpdate(updateOptions);
 
-        expect(await dealUpdateService.getProperty('testcheck url', 'params')).toEqual(result)
+        try {
+            await dealUpdateService.getProperty('testcheck url', 'params');
+        } catch (error) {
+            expect(error).toStrictEqual(new Error('getProperty의 정상적인 데이터 수신에 실패했습니다.'));
+        }
         expect(count).toBe(10)
     })
 })

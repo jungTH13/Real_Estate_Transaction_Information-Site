@@ -2,3 +2,4 @@
 /back/.env
 /back/node_modules/
 /front/.nuxt/
+/back/logs

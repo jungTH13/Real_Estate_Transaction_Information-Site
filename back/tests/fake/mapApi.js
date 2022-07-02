@@ -1,9 +1,10 @@
+const RESPONSE = require('../../src/config/responseState');
+
 module.exports = (address) => {
-    return {
-        state: true,
-        data: {
-            x: 127.156,
-            y: 58.163
-        }
-    }
+    const result = RESPONSE.SUCCESS;
+    result.data = {
+        x: 127.156,
+        y: 58.163
+    };
+    return result;
 }

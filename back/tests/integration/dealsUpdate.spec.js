@@ -10,6 +10,8 @@ const testDb = require('../fake/database');
 const fakeMapApi = require('../fake/mapApi');
 const fakeDealsApi = require('../fake/dealsApi');
 
+process.env.NODE_ENV = 'test';
+
 describe('insertDealdata intgration module test', () => {
     test('api가 정상수신되었을 경우 database를 업데이트 하는가', async () => {
         // given
@@ -23,24 +25,26 @@ describe('insertDealdata intgration module test', () => {
         const sgg_cd = 11110;
 
         // 업데이트할 개월이 3개월 일경우
-        let check = { Year: 2022, Month: 6 };
-        let start = { Year: 2022, Month: 6 };
-        let end = { Year: 2022, Month: 8 };
+        const dateParams = {
+            check: { Year: 2022, Month: 6 },
+            start: { Year: 2022, Month: 6 },
+            end: { Year: 2022, Month: 8 }
+        }
 
         // when
-        await dealUpdateServie.insertDealdata(name, url, sgg_cd, start, end, check);
+        await dealUpdateServie.insertDealdata(name, url, sgg_cd, dateParams);
         const result1 = await locationFormRepository.findAll(sgg_cd)
 
         // then
         expect(result1.length).toEqual(9);
 
         // 기존 데이터가 존재하는 달에서부터 업데이트 할 경우
-        check = { Year: 2022, Month: 6 };
-        start = { Year: 2022, Month: 3 };
-        end = { Year: 2022, Month: 8 };
+        dateParams.check = { Year: 2022, Month: 6 };
+        dateParams.start = { Year: 2022, Month: 3 };
+        dateParams.end = { Year: 2022, Month: 8 };
 
         // when
-        await dealUpdateServie.insertDealdata(name, url, sgg_cd, start, end, check);
+        await dealUpdateServie.insertDealdata(name, url, sgg_cd, dateParams);
         const result2 = await locationFormRepository.findAll(sgg_cd)
 
         // then
