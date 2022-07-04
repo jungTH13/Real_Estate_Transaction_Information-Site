@@ -24,6 +24,22 @@ module.exports = class {
         }
     }
 
+    async findProviousOfRecentlyDeals(coordinate, locationList) {
+        try {
+            let result = [];
+
+            const promises = locationList.map(async (info) => {
+                const sgg_cd = info.sgg_cd;
+                const deals = await this.repository.findProviousOfRecentlyDeals(coordinate, sgg_cd)
+                result = result.concat(deals);
+            })
+            await Promise.all(promises);
+            return result;
+        } catch (error) {
+            RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.DB_FIND_ERROR);
+        }
+    }
+
     async findMaxMinCoordinate(sgg_cd) {
         try {
             const max_x = await this.repository.findMaxOne('x', sgg_cd);

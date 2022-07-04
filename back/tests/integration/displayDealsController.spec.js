@@ -30,7 +30,7 @@ describe('displayDealsController intgration module test', () => {
         };
 
         // when
-        const result = await displayDealsController.basic(updateOptions);
+        const result = await displayDealsController.RecentlyDeals(updateOptions);
 
         // then
         expect(result).toEqual([]);
@@ -69,7 +69,7 @@ describe('displayDealsController intgration module test', () => {
         };
 
         // when
-        const result = await displayDealsController.basic(updateOptions);
+        const result = await displayDealsController.RecentlyDeals(updateOptions);
         for (const deal of result) {
             delete deal.id;
         }
