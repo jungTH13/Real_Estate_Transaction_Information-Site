@@ -6,17 +6,19 @@ const passport = require('passport');
 const passportConfig = require('../../config/passport');
 const cors = require('cors');
 const dotenv = require('dotenv')
+const { logger } = require('../../config/winston');
+const RESPONSE = require('../../config/responseState');
 
 const dealRouter = require('./routes');
 
 app = express();
 dotenv.config();
 
-module.exports = async (port = 7000) => {
+module.exports = async (port = 7000, options) => {
     passportConfig();
 
     app.set('port', port);
-
+    app.locals.options = options;
     app.use(morgan('dev'));
     app.use(cors({
         origin: 'http://127.0.0.1:3000',
@@ -50,17 +52,20 @@ module.exports = async (port = 7000) => {
 
     app.use((error, req, res, next) => {
         if (error.code) {
-            console.error(error)
+            res.status(500).json(error);
         } else {
-            const err = RESPONSE.ROUTE_ERROR;
-            err.message = error;
-            console.error(err)
-        };
-        res.status(500).send('페이지를 찾을 수 없습니다.');
+            const err = RESPONSE.ROUTE_INIT_ERROR
+            logger.error({
+                code: err.code,
+                message: err.message,
+                detail: `${error}`
+            })
+            res.status(500).json(err);
+        }
     });
 
     app.listen(app.get('port'), () => {
-        console.log(`서버 작동중 - PORT:${app.get('port')}`)
+        logger.info(`서버 작동중 - PORT:${app.get('port')}`);
     });
 
     return app;

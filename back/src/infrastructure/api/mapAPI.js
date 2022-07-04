@@ -1,10 +1,11 @@
 const axios = require('axios');
 const dotenv = require('dotenv');
 const RESPONSE = require('../../config/responseState')
+const { logger } = require('../../config/winston')
 
 dotenv.config();
 
-const naver = (text) => new Promise((resolve, reject) => {
+const naver = async (address) => {
     client_id = process.env.NAVER_API_MAP_ID;
     client_secret = process.env.NAVER_API_MAP_SECRET;
     url = process.env.NAVER_API_MAP_URL;
@@ -13,40 +14,35 @@ const naver = (text) => new Promise((resolve, reject) => {
         'X-NCP-APIGW-API-KEY': client_secret
     }
     const params = {
-        query: text
+        query: address
     }
 
-    resolve(axios(url, { headers, params })
-        .then((res) => {
-            // console.log("naver\n",res)
-            if (res.status === 200) {
-                if (res.data.meta.totalCount !== 0) {
-                    const result = RESPONSE.SUCCESS;
-                    result.data = {
-                        x: res.data.addresses[0].x,
-                        y: res.data.addresses[0].y
-                    }
-                    return result;
-                } else {
-                    const result = RESPONSE.SUCCESS_NO_DATA;
-                    result.data = {
-                        x: 0,
-                        y: 0
-                    }
-                    return result;
-                };
-            } else {
-                const err = RESPONSE.API_RESPONSE_ERROR;
-                err.info = res;
-                return err;
-            };
-        })
-        .catch((error) => {
-            const err = RESPONSE.API_ERROR;
-            err.info = error;
-            console.log(err);
-            return err;
-        }));
-});
+    try {
+        const result = await axios(url, { headers, params })
+            .then((res) => res)
+            .catch(() => RESPONSE.API_TIMEOUT);
+        if (result.status !== 200) {
+            return RESPONSE.API_RESPONSE_ERROR;
+        }
+        if (result.data.meta.totalCount > 0) {
+            const response = RESPONSE.SUCCESS;
+            response.data = {
+                x: result.data.addresses[0].x,
+                y: result.data.addresses[0].y
+            }
+            return response;
+        }
+
+        logger.warn(`'${address}' 대한 mapApi 결과가 존재하지 않습니다.`)
+        const response = RESPONSE.SUCCESS_NO_DATA;
+        response.data = {
+            x: 0,
+            y: 0
+        }
+        return response;
+    } catch (error) {
+        RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.API_ERROR);
+    }
+}
 
 module.exports = { naver };

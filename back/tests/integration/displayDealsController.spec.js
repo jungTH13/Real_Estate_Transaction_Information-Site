@@ -7,6 +7,8 @@ const DealDomain = require('../../src/domain/deal');
 const displayDealsController = require('../../src/controllers/displayDealsController');
 const testDb = require('../fake/database');
 
+process.env.NODE_ENV = 'test';
+
 describe('displayDealsController intgration module test', () => {
     test('database에서 일치하는게 없을 경우 빈 리스트를 반환하는가', async () => {
         // given

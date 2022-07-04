@@ -4,10 +4,9 @@ const displayDealsController = require('../../../controllers/displayDealsControl
 const router = express.Router()
 
 router.post('/deal', async (req, res, next) => {
-    const result = await displayDealsController.basic({
-        body: req.body.mapState
-    })
-    console.log('검색된 자료수:', result.length)
+    const result = await displayDealsController.basic({ body: req.body.mapState })
+        .catch((error) => next(error));
+
     res.json({ status: 200, data: result });
 })
 
