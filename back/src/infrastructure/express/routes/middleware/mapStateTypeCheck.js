@@ -1,3 +1,5 @@
+const RESPONSE = require('../../../../config/responseState');
+
 module.exports = (req, res, next) => {
     if (!req.body.mapState) {
         next(RESPONSE.DATA_NULL);

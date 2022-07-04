@@ -8,10 +8,6 @@ const { combine, timestamp, printf } = Winston.format;
 // Define log format
 const logFormat = printf(info => {
     return `[${info.timestamp}] ${info.level}: ${info.message}` + (info.code ? `[code: ${info.code}]` : '') + (info.detail ? `detail: ${info.detail}` : '')
-    // if (info.code) {
-    //     return `[${info.timestamp}] ${info.level}: ${info.message} [code: ${info.code}] detail: ${info.detail}`;
-    // }
-    // return `[${info.timestamp}] ${info.level}: ${info.message}`;
 });
 
 /*
@@ -70,7 +66,7 @@ if ((process.env.NODE_ENV || 'development') === 'development') {
     logger.add(new Winston.transports.Console({
         format: Winston.format.combine(
             Winston.format.colorize(), // 색깔 넣어서 출력
-            logFormat // `${info.level}: ${info.message} JSON.stringify({ ...rest })` 포맷으로 출력
+            logFormat
         )
     }));
 }
