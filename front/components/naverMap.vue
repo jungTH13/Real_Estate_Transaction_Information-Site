@@ -25,6 +25,9 @@ export default {
         dealList() {
             return this.$store.state.dealList.dealList;
         },
+        dealProviousList() {
+            return this.$store.state.dealList.dealProviousList;
+        },
         options() {
             return this.$store.state.dealList.options;
         },
@@ -84,6 +87,9 @@ export default {
         },
         async setMarker(dealList, options = null) {
             let visibleList = [];
+            let dealProviousIndex = 0;
+            let dealProviousLength = this.dealProviousList.length;
+
             const promises = dealList.map((deal, index) => {
                 if (options) {
                     if ((!options.type[deal.house_type]) ||
@@ -91,14 +97,41 @@ export default {
                         (options.date.max[0] < deal.deal_year || (options.date.max[0] == deal.deal_year && options.date.max[1] < deal.deal_month)) ||
                         (options.amount[0] > deal.deal_amount || (options.amount[1] != options.AMOUNTMAX && options.amount[1] < deal.deal_amount))
                     ) {
+                        if (dealProviousIndex < dealProviousLength && this.dealProviousList[dealProviousIndex].max_id == deal.id && this.dealProviousList[dealProviousIndex].name == deal.name) {
+                            dealProviousIndex++;
+                        }
                         deal.visible = false;
                         return;
                     }
                 }
                 visibleList.push(index);
                 deal.visible = true;
+                let contextstyle = 'border: 2px solid rgb(0, 0, 0,0.5);'
+
+                if (dealProviousIndex < dealProviousLength && this.dealProviousList[dealProviousIndex].max_id == deal.id && this.dealProviousList[dealProviousIndex].name == deal.name) {
+                    let dealProvious = this.dealProviousList[dealProviousIndex]
+
+                    if ((options.date.min[0] > dealProvious.deal_year || (options.date.min[0] == dealProvious.deal_year && options.date.min[1] > dealProvious.deal_month)) ||
+                        (options.date.max[0] < dealProvious.deal_year || (options.date.max[0] == dealProvious.deal_year && options.date.max[1] < dealProvious.deal_month))) {
+                        contextstyle = 'border: 2px solid rgb(0, 0, 0,0.5);'
+                    }
+                    else if (deal.deal_amount < dealProvious.deal_amount) {
+                        let blue = 2 * (deal.deal_amount / dealProvious.deal_amount > 0.5 ? 1 - deal.deal_amount / dealProvious.deal_amount : 0.5);
+                        // blue = 105 + parseInt(150 * blue);
+                        // const green = 255 - blue;
+                        // console.log('blue:', blue, ', green:', green);
+                        contextstyle = `border: 2px solid rgb(${blue * 255}, 0, 0,0.75);`;
+                    } else if (deal.deal_amount > dealProvious.deal_amount) {
+                        let red = 2 * (deal.deal_amount / dealProvious.deal_amount < 1.5 ? deal.deal_amount / dealProvious.deal_amount - 1 : 0.5);
+                        // red = 105 + parseInt(150 * red);
+                        // const green = 255 - red;
+                        // console.log('red:', red, ', green:', green);
+                        contextstyle = `border: 2px solid rgb(0, 0, ${255 * red},0.75);`;
+                    }
+                    dealProviousIndex++;
+                }
                 let contentText = `
-                        <div class="marker" alt="">
+                        <div class="marker" style="${contextstyle}" alt="">
                         <div style="font-size:10px; margin:0px">
                         ${this.setAmount(deal.deal_amount)}
                         <div>
@@ -231,6 +264,32 @@ export default {
     padding: 0px 0px 0px 0px;
     position: absolute;
     background-color: #ffffffcc;
+    border: 2px solid rgba(0, 0, 0, 0.253);
+    padding: 0.5rem;
+    line-height: 1rem;
+    border-radius: 0.5rem;
+    width: 55px;
+    height: 25px;
+}
+
+.markerup {
+    overflow: hidden;
+    padding: 0px 0px 0px 0px;
+    position: absolute;
+    background-color: #ffffffcc;
+    border: 2px solid rgba(17, 0, 255, 0.904);
+    padding: 0.5rem;
+    line-height: 1rem;
+    border-radius: 0.5rem;
+    width: 55px;
+    height: 25px;
+}
+
+.markerdown {
+    overflow: hidden;
+    padding: 0px 0px 0px 0px;
+    position: absolute;
+    background-color: #ffffffcc;
     border: 2px solid #1bf;
     padding: 0.5rem;
     line-height: 1rem;
@@ -242,7 +301,7 @@ export default {
 .marker:hover {
     position: absolute;
     background-color: #ffffffcc;
-    border: 2px solid rgb(253, 78, 78);
+    border: 2px solid rgb(0, 0, 0);
     padding: 0.5rem;
     line-height: 1rem;
     border-radius: 0.5rem;
