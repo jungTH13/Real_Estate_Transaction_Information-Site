@@ -26,15 +26,19 @@ module.exports = class {
 
     async findProviousOfRecentlyDeals(coordinate, locationList) {
         try {
-            let result = [];
+            let resultRecent = [];
+            let resultProvious = [];
 
             const promises = locationList.map(async (info) => {
                 const sgg_cd = info.sgg_cd;
-                const deals = await this.repository.findProviousOfRecentlyDeals(coordinate, sgg_cd)
-                result = result.concat(deals);
+                const dealsRecent = await this.repository.findRecentlyDeals(coordinate, sgg_cd)
+                resultRecent = resultRecent.concat(dealsRecent);
+
+                const dealsProvious = await this.repository.findProviousOfRecentlyDeals(coordinate, sgg_cd)
+                resultProvious = resultProvious.concat(dealsProvious);
             })
             await Promise.all(promises);
-            return result;
+            return { resultRecent, resultProvious };
         } catch (error) {
             RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.DB_FIND_ERROR);
         }
