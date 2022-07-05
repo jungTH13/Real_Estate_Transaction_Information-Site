@@ -4,10 +4,15 @@ const displayDealsController = require('../../../controllers/displayDealsControl
 const router = express.Router()
 
 router.post('/deal', async (req, res, next) => {
-    const result = await displayDealsController.basic({ body: req.body.mapState })
+    await displayDealsController.RecentlyDeals(Object.assign(app.locals.options, { body: req.body.mapState }))
+        .then((result) => res.json({ status: 200, data: result }))
         .catch((error) => next(error));
+})
 
-    res.json({ status: 200, data: result });
+router.post('/proviousDeal', async (req, res, next) => {
+    await displayDealsController.ProviousOfRecentlyDeals(Object.assign(app.locals.options, { body: req.body.mapState }))
+        .then((result) => res.json({ status: 200, data: result }))
+        .catch((error) => next(error));
 })
 
 module.exports = router;

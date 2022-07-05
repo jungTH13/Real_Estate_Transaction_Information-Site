@@ -26,6 +26,11 @@ module.exports = class {
         throw new Error('ERR_METHOD_NOT_IMPLEMENTED');
     }
 
+    async findProviousOfRecentlyDeals(coordinate, ssg_cd) {
+        // coordinate = {min_x,min_y,max_x,max_y}
+        throw new Error('ERR_METHOD_NOT_IMPLEMENTED');
+    }
+
     async findMaxOne(attribute, sgg_cd) {
         // only [int,float] type attribute is available
         throw new Error('ERR_METHOD_NOT_IMPLEMENTED');
