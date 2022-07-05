@@ -1,5 +1,6 @@
 export const state = () => ({
   dealList: [],
+  dealProviousList: [],
   visibleDealsIndex: [],
   visible: [],
   mapState: null,
@@ -22,8 +23,12 @@ export const state = () => ({
 
 export const mutations = {
   setDeals(state, payload) {
+    // state.dealList.splice(0);
+    // state.dealList = payload;
     state.dealList.splice(0);
-    state.dealList = payload;
+    state.dealProviousList.splice(0);
+    state.dealList = payload.resultRecent || payload;
+    state.dealProviousList = payload.resultProvious || [];
   },
   setMapState(state, payload) {
     state.mapState = payload;
@@ -56,7 +61,7 @@ export const mutations = {
 
 export const actions = {
   async setDeals({ commit }, payload) {
-    await this.$axios.post('http://127.0.0.1:7000/deal', {
+    await this.$axios.post('http://127.0.0.1:7000/proviousDeal', {
       mapState: payload
     })
       .then(async (res) => {
