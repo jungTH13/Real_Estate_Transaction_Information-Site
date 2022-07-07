@@ -71,9 +71,11 @@ module.exports = (sgg_cd) => {
                 y: {
                     type: Sequelize.FLOAT,
                     allowNull: false
-
+                },
+                provious: {
+                    type: Sequelize.INTEGER,
+                    allowNull: true
                 }
-
             }, {
                 sequelize,
                 timestamps: false,

@@ -1,5 +1,5 @@
 module.exports = class {
-    constructor(dong, name, jibun, deal_amount, build_year, deal_year, deal_month, deal_day, area, floor, house_type, cancel_deal_type, cancel_deal_day, req_gbn, x, y) {
+    constructor(dong, name, jibun, deal_amount, build_year, deal_year, deal_month, deal_day, area, floor, house_type, cancel_deal_type, cancel_deal_day, req_gbn, x, y, provious = null) {
         this.dong = dong // string
         this.name = name // string
         this.jibun = jibun // string
@@ -16,5 +16,6 @@ module.exports = class {
         this.req_gbn = req_gbn // string
         this.x = x // float
         this.y = y // float
+        this.provious = provious // int
     }
 }
