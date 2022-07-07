@@ -25,20 +25,27 @@ module.exports = class {
     }
 
     async findProviousOfRecentlyDeals(coordinate, locationList) {
+        const resultRecent = {};
+        const resultProvious = {};
+        let resultRecentList = [];
+        let resultProviousList = [];
         try {
-            let resultRecent = [];
-            let resultProvious = [];
-
             const promises = locationList.map(async (info) => {
                 const sgg_cd = info.sgg_cd;
                 const dealsRecent = await this.repository.findRecentlyDeals(coordinate, sgg_cd)
-                resultRecent = resultRecent.concat(dealsRecent);
+                resultRecent[sgg_cd] = dealsRecent;
 
                 const dealsProvious = await this.repository.findProviousOfRecentlyDeals(dealsRecent, sgg_cd)
-                resultProvious = resultProvious.concat(dealsProvious);
+                resultProvious[sgg_cd] = dealsProvious;
             })
             await Promise.all(promises);
-            return { resultRecent, resultProvious };
+
+            for (const info of locationList) {
+                resultRecentList = resultRecentList.concat(resultRecent[info.sgg_cd]);
+                resultProviousList = resultProviousList.concat(resultProvious[info.sgg_cd]);
+            }
+
+            return { resultRecent: resultRecentList, resultProvious: resultProviousList };
         } catch (error) {
             RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.DB_FIND_ERROR);
         }

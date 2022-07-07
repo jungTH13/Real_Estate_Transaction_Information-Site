@@ -95,6 +95,7 @@ module.exports = class extends LocationFormrepository {
                     // x: { [Op.and]: [{ [Op.gt]: coordinate.min_x }, { [Op.lt]: coordinate.max_x }] },
                     // y: { [Op.and]: [{ [Op.gt]: coordinate.min_y }, { [Op.lt]: coordinate.max_y }] }
                 },
+                order: [['provious', 'ASC']],
                 raw: true
             })
 
@@ -107,17 +108,17 @@ module.exports = class extends LocationFormrepository {
                 search.push(deal);
             }
         }
-        console.log(`${ssg_cd}: `, search.length);
         return search;
     }
 
-    async findProviousOfRecentlyDeals(dealsList, ssg_cd) {
+    async findProviousOfRecentlyDeals(deals, ssg_cd) {
         // 좌표기준 건물의 거래 내역중 가장 최근 거래 내역 한개만을 표시(house_type 무시)
         const idList = [];
-        for (deal of dealsList) {
+        const table = this.models[ssg_cd];
+
+        for (const deal of deals) {
             idList.push(deal.provious);
         }
-        const table = this.models[ssg_cd];
         const results = await table.findAll({
             where: {
                 id: { [Op.in]: idList }
