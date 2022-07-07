@@ -34,7 +34,7 @@ module.exports = class {
                 const dealsRecent = await this.repository.findRecentlyDeals(coordinate, sgg_cd)
                 resultRecent = resultRecent.concat(dealsRecent);
 
-                const dealsProvious = await this.repository.findProviousOfRecentlyDeals(coordinate, sgg_cd)
+                const dealsProvious = await this.repository.findProviousOfRecentlyDeals(dealsRecent, sgg_cd)
                 resultProvious = resultProvious.concat(dealsProvious);
             })
             await Promise.all(promises);

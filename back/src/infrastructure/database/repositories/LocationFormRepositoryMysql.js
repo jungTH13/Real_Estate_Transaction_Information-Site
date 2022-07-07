@@ -111,42 +111,20 @@ module.exports = class extends LocationFormrepository {
         return search;
     }
 
-    async findProviousOfRecentlyDeals(coordinate, ssg_cd) {
+    async findProviousOfRecentlyDeals(dealsList, ssg_cd) {
         // 좌표기준 건물의 거래 내역중 가장 최근 거래 내역 한개만을 표시(house_type 무시)
-
-        if (!globalLocationFormRepositoryMemory.findProviousOfRecentlyDeals[ssg_cd]) {
-            const results = await this.sequelize.query(
-                `select AA.*,BB.max_id
-                from projectdev.${ssg_cd} as AA
-                inner join
-                    (select max(id) as s_max_id, max_id
-                    from
-                        (select a.*,b.id as max_id
-                        from projectdev.${ssg_cd} as a
-                        inner join
-                            (select *
-                            from projectdev.${ssg_cd}
-                            where id in 
-                                (SELECT max(id)
-                                FROM projectdev.${ssg_cd}
-                                group by dong,name)) as b
-                        on a.dong = b.dong and a.name = b.name
-                        where a.id != b.id and a.area = b.area and ((b.floor > 0 and a.floor > 0) and (a.floor >= b.floor-3 and a.floor <= b.floor+3) or (b.floor < 0 and a.floor < 0)))as s
-                    group by max_id) as BB
-                on AA.id = BB.s_max_id
-                order by max_id`, { type: this.sequelize.QueryTypes.SELECT })
-
-            globalLocationFormRepositoryMemory.findProviousOfRecentlyDeals[ssg_cd] = results;
+        const idList = [];
+        for (deal of dealsList) {
+            idList.push(deal.provious);
         }
-
-        const search = [];
-        for (const deal of globalLocationFormRepositoryMemory.findProviousOfRecentlyDeals[ssg_cd]) {
-            if (deal.x > coordinate.min_x && deal.x < coordinate.max_x && deal.y > coordinate.min_y && deal.y < coordinate.max_y) {
-                search.push(deal);
-            }
-        }
-        console.log(`${ssg_cd}: `, search.length);
-        return search;
+        const table = this.models[ssg_cd];
+        const results = await table.findAll({
+            where: {
+                id: { [Op.in]: idList }
+            },
+            raw: true
+        })
+        return results;
     }
 
     async findMaxOne(attribute, sgg_cd) {
