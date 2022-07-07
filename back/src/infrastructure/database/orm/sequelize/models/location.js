@@ -24,22 +24,22 @@ module.exports = class Location extends Sequelize.Model {
                 allowNull: false
             },
             min_x: {
-                type: Sequelize.FLOAT,
+                type: Sequelize.DOUBLE(),
                 allowNull: true
 
             },
             min_y: {
-                type: Sequelize.FLOAT,
+                type: Sequelize.DOUBLE(),
                 allowNull: true
 
             },
             max_x: {
-                type: Sequelize.FLOAT,
+                type: Sequelize.DOUBLE(),
                 allowNull: true
 
             },
             max_y: {
-                type: Sequelize.FLOAT,
+                type: Sequelize.DOUBLE(),
                 allowNull: true
 
             }

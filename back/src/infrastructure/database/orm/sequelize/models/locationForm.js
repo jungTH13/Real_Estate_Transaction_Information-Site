@@ -64,12 +64,12 @@ module.exports = (sgg_cd) => {
                     allowNull: true
                 },
                 x: {
-                    type: Sequelize.FLOAT,
+                    type: Sequelize.DOUBLE(),
                     allowNull: false
 
                 },
                 y: {
-                    type: Sequelize.FLOAT,
+                    type: Sequelize.DOUBLE(),
                     allowNull: false
                 },
                 provious: {
