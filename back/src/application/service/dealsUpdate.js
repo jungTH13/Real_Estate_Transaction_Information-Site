@@ -74,8 +74,10 @@ module.exports = class dealUpdate {
 
                 for (const data of res.data) {
                     const res = await this.findCoordinate(await this.addressParse(name, data));
-
-                    deals.push(new DealDomain(data['법정동'], (data['단지'] || data['연립다세대'] || data['아파트']), data['지번'], parseInt(data['거래금액'].replace(/,/g, '')), data['건축년도'], data['년'], data['월'], data['일'], data['전용면적'], data['층'], name, (data['해제여부'] === 'O'), data['해제사유발생일'], data['거래유형'], res.data.x, res.data.y));
+                    const deal = new DealDomain(data['법정동'], (data['단지'] || data['연립다세대'] || data['아파트']), data['지번'], parseInt(data['거래금액'].replace(/,/g, '')), data['건축년도'], data['년'], data['월'], data['일'], data['전용면적'], data['층'], name, (data['해제여부'] === 'O'), data['해제사유발생일'], data['거래유형'], res.data.x, res.data.y);
+                    const provious = await this.LocationForm.findProviousDealOne(deal, sgg_cd);
+                    deal.provious = (provious ? provious.id : null);
+                    deals.push(deal);
                 }
                 await this.dataInsertOrSwap(sgg_cd, name, start, check, deals);
                 logger.info(`'${sgg_cd}${name}': ${start.Year}.${start.Month} 완료`);
@@ -170,11 +172,6 @@ module.exports = class dealUpdate {
             const LocationForm = this.LocationForm;
             try {
                 if (check.Year > start.Year || (check.Year === start.Year && check.Month >= start.Month)) {
-                    // await LocationForm.deleteDeals({
-                    //         house_type:name,
-                    //         Year:start.Year,
-                    //         Month:start.Month,
-                    // },sgg_cd)
                     await LocationForm.deleteDeals(name, start.Year, start.Month, sgg_cd)
                         .then(async () => {
                             await LocationForm.bulkCreate(deals, sgg_cd);
