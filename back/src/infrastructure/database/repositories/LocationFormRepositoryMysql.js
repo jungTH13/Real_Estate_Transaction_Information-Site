@@ -44,6 +44,40 @@ module.exports = class extends LocationFormrepository {
         return await this.models[sgg_cd].findOne(ormOptions);
     }
 
+    async findDealsYM(year, month, name, sgg_cd) {
+        return await this.models[sgg_cd].findAll({
+            where: {
+                deal_year: year,
+                deal_month: month,
+                house_type: name
+            },
+            raw: true
+        })
+    }
+
+    async findProviousDealOne(deal, sgg_cd) {
+        const limit = 3
+        return await this.models[sgg_cd].findOne({
+            where: {
+                name: deal.name,
+                area: { [Op.and]: [{ [Op.gte]: Math.floor(deal.area) }, { [Op.lt]: Math.floor(deal.area) + 1 }] },
+                dong: deal.dong,
+                house_type: deal.house_type,
+                [Op.or]: [
+                    { deal_year: { [Op.lt]: deal.deal_year } }, {
+                        [Op.and]: [
+                            { deal_year: deal.deal_year },
+                            { deal_month: { [Op.lte]: deal.deal_month } },
+                            { deal_day: { [Op.lt]: deal.deal_day } }
+                        ]
+                    }
+                ],
+                floor: (deal.floor >= 0 ? { [Op.and]: [{ [Op.gte]: (deal.floor - limit > 0 ? deal.floor - limit : 1) }, { [Op.lte]: deal.floor + limit }] } : { [Op.lt]: 0 })
+            },
+            order: [['deal_year', 'DESC'], ['deal_month', 'DESC'], ['deal_day', 'DESC']]
+        });
+    }
+
     async findRecentlyDealOnType(hous_type, sgg_cd) {
         return await this.models[sgg_cd].findOne({
             where: { house_type: hous_type },

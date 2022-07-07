@@ -17,6 +17,14 @@ module.exports = class {
         throw new Error('ERR_METHOD_NOT_IMPLEMENTED');
     }
 
+    async findDealsYM(year, month, name, sgg_cd) {
+        throw new Error('ERR_METHOD_NOT_IMPLEMENTED');
+    }
+
+    async findProviousDealOne(deal, sgg_cd) {
+        throw new Error('ERR_METHOD_NOT_IMPLEMENTED');
+    }
+
     async findRecentlyDealOnType(hous_type, sgg_cd) {
         throw new Error('ERR_METHOD_NOT_IMPLEMENTED');
     }
