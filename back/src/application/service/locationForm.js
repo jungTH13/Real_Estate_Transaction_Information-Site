@@ -57,8 +57,10 @@ module.exports = class {
             const min_x = await this.repository.findMinOne('x', sgg_cd);
             const max_y = await this.repository.findMaxOne('y', sgg_cd);
             const min_y = await this.repository.findMinOne('y', sgg_cd);
-
-            return new CoordinateDomain(min_x.x, max_x.x, min_y.y, max_y.y);
+            if (max_x) {
+                return new CoordinateDomain(min_x.x, max_x.x, min_y.y, max_y.y);
+            }
+            return new CoordinateDomain(min_x, max_x, min_y, max_y);
         } catch (error) {
             return RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.DB_FIND_ERROR_NAME(sgg_cd));
         }
