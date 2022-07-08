@@ -1,6 +1,6 @@
 const db = require('../orm/sequelize/models');
 const { Op } = require('sequelize');
-const Sequelize = require('sequelize');
+// const Sequelize = require('sequelize');
 const env = process.env.NODE_ENV || 'development';
 const config = require('../../../config/config.json')[env];
 const LocationFormrepository = require('../../../application/interface/LocationFormRepository')
@@ -10,12 +10,10 @@ module.exports = class extends LocationFormrepository {
         super();
         this.models = database.LocationForm;
         this.sequelize = database.sequelize;
-        if (!global.globalLocationFormRepositoryMemory) {
-            global.globalLocationFormRepositoryMemory = {
-                findRecentlyDeals: {},
-                findProviousOfRecentlyDeals: {}
-            };
+        if (!global.repositorybuffer) {
+            global.repositorybuffer = {};
         }
+        this.buffer = global.repositorybuffer
     }
 
     async initMemory() {
@@ -67,8 +65,7 @@ module.exports = class extends LocationFormrepository {
                     { deal_year: { [Op.lt]: deal.deal_year } }, {
                         [Op.and]: [
                             { deal_year: deal.deal_year },
-                            { deal_month: { [Op.lte]: deal.deal_month } },
-                            { deal_day: { [Op.lt]: deal.deal_day } }
+                            { deal_month: { [Op.lt]: deal.deal_month } }
                         ]
                     }
                 ],
@@ -85,30 +82,47 @@ module.exports = class extends LocationFormrepository {
         })
     }
 
-    async findRecentlyDeals(coordinate, ssg_cd) {
+    async findRecentlyDealsId(year, month, ssg_cd) {
         // 좌표기준 건물의 거래 내역중 가장 최근 거래 내역 한개만을 표시(house_type 무시)
-        if (!globalLocationFormRepositoryMemory.findRecentlyDeals[ssg_cd]) {
-            const table = this.models[ssg_cd];
-            const results = await table.findAll({
-                where: {
-                    id: { [Op.in]: [Sequelize.literal('select max(id) as id from' + (config.dialect === 'sqlite' ? ` '${ssg_cd}' ` : ` ${config.database}.${ssg_cd} `) + 'group by dong,name')] }
-                    // x: { [Op.and]: [{ [Op.gt]: coordinate.min_x }, { [Op.lt]: coordinate.max_x }] },
-                    // y: { [Op.and]: [{ [Op.gt]: coordinate.min_y }, { [Op.lt]: coordinate.max_y }] }
-                },
-                order: [['provious', 'ASC']],
-                raw: true
-            })
-
-            globalLocationFormRepositoryMemory.findRecentlyDeals[ssg_cd] = results;
+        if (!this.buffer[ssg_cd]) {
+            this.buffer[ssg_cd] = {};
         }
-
-        const search = [];
-        for (const deal of globalLocationFormRepositoryMemory.findRecentlyDeals[ssg_cd]) {
-            if (deal.x > coordinate.min_x && deal.x < coordinate.max_x && deal.y > coordinate.min_y && deal.y < coordinate.max_y) {
-                search.push(deal);
+        if (this.buffer[ssg_cd][`${year}${month}`]) {
+            const idList = this.buffer[ssg_cd][`${year}${month}`];
+            const maxIdDeal = await this.findMaxOne('id', ssg_cd);
+            if (idList[idList.length - 1] === maxIdDeal.id) {
+                return idList;
             }
         }
-        return search;
+
+        const results = await this.sequelize.query(
+            `select max(id) as id 
+            from (SELECT * FROM` + (config.dialect === 'sqlite' ? ` '${ssg_cd}' ` : ` ${config.database}.${ssg_cd} `) +
+            `WHERE deal_year < ${year} OR (deal_year = ${year} AND deal_month <= ${month})) AS a
+            group by dong,name
+            order by id`,
+            { type: this.sequelize.QueryTypes.SELECT })
+        const idList = []
+        for (const id of results) {
+            idList.push(id.id);
+        }
+        this.buffer[ssg_cd][`${year}${month}`] = idList;
+        return idList
+    }
+
+    async findDealsOfIdCoordinate(idList, coordinate, ssg_cd) {
+        // 좌표기준 건물의 거래 내역중 가장 최근 거래 내역 한개만을 표시(house_type 무시)
+        const table = this.models[ssg_cd];
+        const results = await table.findAll({
+            where: {
+                id: { [Op.in]: idList },
+                x: { [Op.and]: [{ [Op.gt]: coordinate.min_x }, { [Op.lt]: coordinate.max_x }] },
+                y: { [Op.and]: [{ [Op.gt]: coordinate.min_y }, { [Op.lt]: coordinate.max_y }] }
+            },
+            order: [['provious', 'ASC']],
+            raw: true
+        })
+        return results;
     }
 
     async findProviousOfRecentlyDeals(deals, ssg_cd) {

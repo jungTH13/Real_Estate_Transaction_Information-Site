@@ -14,8 +14,11 @@ module.exports = class {
 
             const promises = locationList.map(async (info) => {
                 const ssg_cd = info.sgg_cd;
-                const deals = await this.repository.findRecentlyDeals(coordinate, ssg_cd)
-                result = result.concat(deals);
+                const year = new Date().getFullYear();
+                const month = new Date().getMonth() + 1;
+                const dealsRecentIdList = await this.repository.findRecentlyDealsId(year, month, ssg_cd);
+                const dealsRecent = await this.repository.findDealsOfIdCoordinate(dealsRecentIdList, coordinate, ssg_cd);
+                result = result.concat(dealsRecent);
             })
             await Promise.all(promises);
             return result;
@@ -24,7 +27,7 @@ module.exports = class {
         }
     }
 
-    async findProviousOfRecentlyDeals(coordinate, locationList) {
+    async findProviousOfRecentlyDeals(coordinate, year, month, locationList) {
         const resultRecent = {};
         const resultProvious = {};
         let resultRecentList = [];
@@ -32,7 +35,8 @@ module.exports = class {
         try {
             const promises = locationList.map(async (info) => {
                 const sgg_cd = info.sgg_cd;
-                const dealsRecent = await this.repository.findRecentlyDeals(coordinate, sgg_cd)
+                const dealsRecentIdList = await this.repository.findRecentlyDealsId(year, month, sgg_cd);
+                const dealsRecent = await this.repository.findDealsOfIdCoordinate(dealsRecentIdList, coordinate, sgg_cd);
                 resultRecent[sgg_cd] = dealsRecent;
 
                 const dealsProvious = await this.repository.findProviousOfRecentlyDeals(dealsRecent, sgg_cd)
