@@ -5,7 +5,11 @@ const DealDomain = require('../../src/domain/deal');
 
 describe('findIncludeArea module test', () => {
     const fakeRepository = {
-        findRecentlyDeals: (coordinate, ssg_cd) => {
+        findRecentlyDealsId: (coordinate, ssg_cd) => {
+            const deals = [{ id: 1 }];
+            return deals;
+        },
+        findDealsOfIdCoordinate: (IdList, coordinate, ssg_cd) => {
             const deals = [new DealDomain('내수동', '경희궁의아침3단지', '72', 200000, 2004, 2022, 1, 14, 150.48, 3, '아파트', 0, '', '중개거래', 126.972, 37.5736)];
             return deals;
         }
