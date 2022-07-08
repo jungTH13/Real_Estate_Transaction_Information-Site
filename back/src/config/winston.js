@@ -7,7 +7,7 @@ const { combine, timestamp, printf } = Winston.format;
 
 // Define log format
 const logFormat = printf(info => {
-    return `[${info.timestamp}] ${info.level}: ${info.message}` + (info.code ? `[code: ${info.code}]` : '') + (info.detail ? `detail: ${info.detail}` : '')
+    return `[${info.timestamp}] ${info.level}: ${info.message}` + (info.code ? `[code: ${info.code}]` : '') + (info.detail ? `detail: ${info.detail}` : '') + (info.stack ? `\n stack:\n ${info.stack}` : '')
 });
 
 /*
