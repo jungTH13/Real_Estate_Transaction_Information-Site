@@ -14,8 +14,11 @@ module.exports = class {
 
             const promises = locationList.map(async (info) => {
                 const ssg_cd = info.sgg_cd;
-                const deals = await this.repository.findRecentlyDeals(coordinate, ssg_cd)
-                result = result.concat(deals);
+                const year = new Date().getFullYear();
+                const month = new Date().getMonth() + 1;
+                const dealsRecentIdList = await this.repository.findRecentlyDealsId(year, month, ssg_cd);
+                const dealsRecent = await this.repository.findDealsOfIdCoordinate(dealsRecentIdList, coordinate, ssg_cd);
+                result = result.concat(dealsRecent);
             })
             await Promise.all(promises);
             return result;
@@ -24,21 +27,29 @@ module.exports = class {
         }
     }
 
-    async findProviousOfRecentlyDeals(coordinate, locationList) {
+    async findProviousOfRecentlyDeals(coordinate, year, month, locationList) {
+        const resultRecent = {};
+        const resultProvious = {};
+        let resultRecentList = [];
+        let resultProviousList = [];
         try {
-            let resultRecent = [];
-            let resultProvious = [];
-
             const promises = locationList.map(async (info) => {
                 const sgg_cd = info.sgg_cd;
-                const dealsRecent = await this.repository.findRecentlyDeals(coordinate, sgg_cd)
-                resultRecent = resultRecent.concat(dealsRecent);
+                const dealsRecentIdList = await this.repository.findRecentlyDealsId(year, month, sgg_cd);
+                const dealsRecent = await this.repository.findDealsOfIdCoordinate(dealsRecentIdList, coordinate, sgg_cd);
+                resultRecent[sgg_cd] = dealsRecent;
 
-                const dealsProvious = await this.repository.findProviousOfRecentlyDeals(coordinate, sgg_cd)
-                resultProvious = resultProvious.concat(dealsProvious);
+                const dealsProvious = await this.repository.findProviousOfRecentlyDeals(dealsRecent, sgg_cd)
+                resultProvious[sgg_cd] = dealsProvious;
             })
             await Promise.all(promises);
-            return { resultRecent, resultProvious };
+
+            for (const info of locationList) {
+                resultRecentList = resultRecentList.concat(resultRecent[info.sgg_cd]);
+                resultProviousList = resultProviousList.concat(resultProvious[info.sgg_cd]);
+            }
+
+            return { resultRecent: resultRecentList, resultProvious: resultProviousList };
         } catch (error) {
             RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.DB_FIND_ERROR);
         }
@@ -50,8 +61,10 @@ module.exports = class {
             const min_x = await this.repository.findMinOne('x', sgg_cd);
             const max_y = await this.repository.findMaxOne('y', sgg_cd);
             const min_y = await this.repository.findMinOne('y', sgg_cd);
-
-            return new CoordinateDomain(min_x.x, max_x.x, min_y.y, max_y.y);
+            if (max_x) {
+                return new CoordinateDomain(min_x.x, max_x.x, min_y.y, max_y.y);
+            }
+            return new CoordinateDomain(min_x, max_x, min_y, max_y);
         } catch (error) {
             return RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.DB_FIND_ERROR_NAME(sgg_cd));
         }

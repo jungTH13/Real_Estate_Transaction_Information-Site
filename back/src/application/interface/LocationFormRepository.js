@@ -17,16 +17,27 @@ module.exports = class {
         throw new Error('ERR_METHOD_NOT_IMPLEMENTED');
     }
 
+    async findDealsYM(year, month, name, sgg_cd) {
+        throw new Error('ERR_METHOD_NOT_IMPLEMENTED');
+    }
+
+    async findProviousDealOne(deal, sgg_cd) {
+        throw new Error('ERR_METHOD_NOT_IMPLEMENTED');
+    }
+
     async findRecentlyDealOnType(hous_type, sgg_cd) {
         throw new Error('ERR_METHOD_NOT_IMPLEMENTED');
     }
 
-    async findRecentlyDeals(coordinate, ssg_cd) {
-        // coordinate = {min_x,min_y,max_x,max_y}
+    async findRecentlyDealsId(year, month, ssg_cd) {
         throw new Error('ERR_METHOD_NOT_IMPLEMENTED');
     }
 
-    async findProviousOfRecentlyDeals(coordinate, ssg_cd) {
+    async findDealsOfId(idList, ssg_cd) {
+        throw new Error('ERR_METHOD_NOT_IMPLEMENTED');
+    }
+
+    async findDealsOfIdCoordinate(idList, coordinate, ssg_cd) {
         // coordinate = {min_x,min_y,max_x,max_y}
         throw new Error('ERR_METHOD_NOT_IMPLEMENTED');
     }

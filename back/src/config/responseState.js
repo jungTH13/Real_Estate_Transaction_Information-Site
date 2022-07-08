@@ -25,7 +25,8 @@ module.exports = {
             logger.error({
                 code: Type.code,
                 message: Type.message,
-                detail: `${error}`
+                detail: `${error}`,
+                stack: `${error.stack}`
             })
             throw Type;
         }

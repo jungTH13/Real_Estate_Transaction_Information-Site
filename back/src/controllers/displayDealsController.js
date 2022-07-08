@@ -30,10 +30,12 @@ exports.ProviousOfRecentlyDeals = async (options) => {
         max_x: options.body.bounds.max.x,
         max_y: options.body.bounds.max.y
     }
+    const year = options.body.year || new Date().getFullYear();
+    const month = options.body.month || new Date().getMonth() + 1;
 
     try {
         const locationList = await locationService.findIncluedArea(coordinate);
-        return await locationFormService.findProviousOfRecentlyDeals(coordinate, locationList);
+        return await locationFormService.findProviousOfRecentlyDeals(coordinate, year, month, locationList);
     } catch (error) {
         RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.CONTROLLER_ERROR_NAME('ProviousOfRecentlyDeals'))
     }
