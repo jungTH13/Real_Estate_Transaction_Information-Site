@@ -32,7 +32,6 @@ export default {
   mounted() {
     //this.data.labels=this.labels;
     this.config.data = this.data;
-    console.log(this.data.labels);
 
     const myChart = new Chart(
       document.getElementById('myChart'),
@@ -65,6 +64,9 @@ export default {
     }
   },
   methods: {
+    setDate(data) {
+      return (`${data.deal_year}.${data.deal_month}`)
+    },
     setTradingVolumList() {
       this.$store.dispatch('graph/setTradingVolum', this.mapState);
     },
@@ -72,6 +74,19 @@ export default {
       const labels = [];
       this.data.datasets.splice(0)
       const dateInfo = this.options.date;
+      const date = {
+        deal_year: dateInfo.min[0],
+        deal_month: dateInfo.min[1]
+      }
+
+      while (dateInfo.max[0] > date.deal_year || (dateInfo.max[0] == date.deal_year && dateInfo.max[1] >= date.deal_month)) {
+        labels.push(this.setDate(date))
+        date.deal_month++;
+        if (date.deal_month > 12) {
+          date.deal_year++;
+          date.deal_month = 1;
+        }
+      }
 
       for (const locationCode in tradingVolumList) {
         const volumList = tradingVolumList[locationCode];
@@ -79,41 +94,32 @@ export default {
           continue;
         }
 
-        let dong = volumList[0].dong;
-        let countList = [];
+        for (let i = 0; i < volumList.length;) {
+          if ((dateInfo.min[0] < volumList[i].deal_year || (dateInfo.min[0] == volumList[i].deal_year && dateInfo.min[1] <= volumList[i].deal_month)) &&
+            (dateInfo.max[0] > volumList[i].deal_year || (dateInfo.max[0] == volumList[i].deal_year && dateInfo.max[1] >= volumList[i].deal_month))) {
+            let dong = volumList[i].dong;
+            let countList = [];
 
-        for (const data of volumList) {
-          if (dong != data.dong) {
-            this.data.datasets.push({
-              label: dong,
-              backgroundColor: '#2E495E00',
-              borderColor: `rgb(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)})`,
-              data: countList
-            });
-            dong = data.dong;
-            countList = [];
-          }
-
-          if ((dateInfo.min[0] < data.deal_year || (dateInfo.min[0] == data.deal_year && dateInfo.min[1] <= data.deal_month)) &&
-            (dateInfo.max[0] > data.deal_year || (dateInfo.max[0] == data.deal_year && dateInfo.max[1] >= data.deal_month))) {
-            if (!labels.includes(`${data.deal_year}.${data.deal_month}`)) {
-              labels.push(`${data.deal_year}.${data.deal_month}`);
+            for (const date of labels) {
+              if (volumList[i] && dong == volumList[i].dong && date == this.setDate(volumList[i])) {
+                countList.push(volumList[i].count);
+                i++;
+              } else {
+                countList.push(0);
+              }
             }
-            countList.push(data.count);
-          }
 
-          if (data == volumList[volumList.length - 1]) {
             this.data.datasets.push({
               label: dong,
               backgroundColor: '#2E495E00',
               borderColor: `rgb(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)})`,
               data: countList
             });
+          } else {
+            i++;
           }
         }
-
       }
-
       this.data.labels = labels;
       this.chart.update();
 
