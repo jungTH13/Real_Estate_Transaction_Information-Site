@@ -158,4 +158,16 @@ module.exports = class extends LocationFormrepository {
     async bulkCreate(deals, sgg_cd) {
         return await this.models[sgg_cd].bulkCreate(deals);
     }
+
+    async monthlyTradingVolum(coordinate, sgg_cd) {
+        return await this.models[sgg_cd].findAll({
+            attributes: ['dong', 'deal_year', 'deal_month', [this.sequelize.fn('COUNT', this.sequelize.col('name')), 'count']],
+            where: {
+                x: { [Op.and]: [{ [Op.gt]: coordinate.min_x }, { [Op.lt]: coordinate.max_x }] },
+                y: { [Op.and]: [{ [Op.gt]: coordinate.min_y }, { [Op.lt]: coordinate.max_y }] }
+            },
+            group: ['dong', 'deal_year', 'deal_month'],
+            order: ['dong']
+        })
+    }
 }

@@ -56,4 +56,9 @@ module.exports = class {
         // deals = [deal,deal, ...]
         throw new Error('ERR_METHOD_NOT_IMPLEMENTED');
     }
+
+    async monthlyTradingVolum(coordinate, sgg_cd) {
+        // coordinate = {min_x,min_y,max_x,max_y}
+        throw new Error('ERR_METHOD_NOT_IMPLEMENTED');
+    }
 }
