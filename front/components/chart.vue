@@ -52,6 +52,9 @@ export default {
     },
     options() {
       return this.$store.state.dealList.options;
+    },
+    refreshMarker() {
+      return this.$store.state.dealList.refreshMarker;
     }
   },
   watch: {
@@ -61,7 +64,11 @@ export default {
     },
     tradingVolumList(newVal, oldVal) {
       this.setGraphData(newVal);
+    },
+    refreshMarker(newVal, oldVal) {
+      this.setGraphData(this.tradingVolumList);
     }
+
   },
   methods: {
     setDate(data) {
@@ -74,6 +81,7 @@ export default {
       const labels = [];
       this.data.datasets.splice(0)
       const dateInfo = this.options.date;
+      const houseType = this.options.type;
       const date = {
         deal_year: dateInfo.min[0],
         deal_month: dateInfo.min[1]
@@ -102,7 +110,7 @@ export default {
 
             for (const date of labels) {
               if (volumList[i] && dong == volumList[i].dong && date == this.setDate(volumList[i])) {
-                countList.push(volumList[i].count);
+                countList.push((houseType['오피스텔'] ? volumList[i]['오피스텔'] : 0) + (houseType['아파트'] ? volumList[i]['아파트'] : 0) + (houseType['연립다세대'] ? volumList[i]['연립다세대'] : 0));
                 i++;
               } else {
                 countList.push(0);
