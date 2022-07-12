@@ -161,7 +161,11 @@ module.exports = class extends LocationFormrepository {
 
     async monthlyTradingVolum(coordinate, sgg_cd) {
         return await this.models[sgg_cd].findAll({
-            attributes: ['dong', 'deal_year', 'deal_month', [this.sequelize.fn('COUNT', this.sequelize.col('name')), 'count']],
+            attributes: ['dong', 'deal_year', 'deal_month', [this.sequelize.fn('COUNT', this.sequelize.col('house_type')), 'count'],
+                [this.sequelize.literal('COUNT(case when house_type=\'아파트\' then 1 end)'), '아파트'],
+                [this.sequelize.literal('COUNT(case when house_type=\'연립다세대\' then 1 end)'), '연립다세대'],
+                [this.sequelize.literal('COUNT(case when house_type=\'오피스텔\' then 1 end)'), '오피스텔']
+            ],
             where: {
                 x: { [Op.and]: [{ [Op.gt]: coordinate.min_x }, { [Op.lt]: coordinate.max_x }] },
                 y: { [Op.and]: [{ [Op.gt]: coordinate.min_y }, { [Op.lt]: coordinate.max_y }] }
