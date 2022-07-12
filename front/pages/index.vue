@@ -16,7 +16,7 @@
         <nav class="navBar">
             <v-toolbar dark color="green">
                 <v-toolbar-title>
-                    <nuxt-link to="/">NodeBird</nuxt-link>
+                    <nuxt-link to="/">지역 검색</nuxt-link>
                 </v-toolbar-title>
                 <v-toolbar-items style="margin-left:20px">
                     <v-form @submit.prevent="searchPlace">
@@ -28,10 +28,10 @@
                 </v-toolbar-items>
                 <v-spacer />
                 <v-toolbar-items>
-                    <v-btn text nuxt to="/profile">
+                    <v-btn text nuxt to="">
                         <div>프로필</div>
                     </v-btn>
-                    <v-btn text nuxt to="/signup">
+                    <v-btn text nuxt to="">
                         <div>회원가입</div>
                     </v-btn>
                 </v-toolbar-items>
