@@ -97,7 +97,7 @@ export default {
                         (options.date.max[0] < deal.deal_year || (options.date.max[0] == deal.deal_year && options.date.max[1] < deal.deal_month)) ||
                         (options.amount[0] > deal.deal_amount || (options.amount[1] != options.AMOUNTMAX && options.amount[1] < deal.deal_amount))
                     ) {
-                        if (dealProviousIndex < dealProviousLength && this.dealProviousList[dealProviousIndex].max_id == deal.id && this.dealProviousList[dealProviousIndex].name == deal.name) {
+                        if (deal.provious && dealProviousIndex < dealProviousLength && this.dealProviousList[dealProviousIndex].name == deal.name && this.dealProviousList[dealProviousIndex].id == deal.provious && this.dealProviousList[dealProviousIndex].dong == deal.dong) {
                             dealProviousIndex++;
                         }
                         deal.visible = false;
@@ -106,27 +106,26 @@ export default {
                 }
                 visibleList.push(index);
                 deal.visible = true;
-                let contextstyle = 'border: 2px solid rgb(0, 0, 0,0.5);'
-
-                if (dealProviousIndex < dealProviousLength && this.dealProviousList[dealProviousIndex].max_id == deal.id && this.dealProviousList[dealProviousIndex].name == deal.name) {
+                let contextstyle = 'border: 1px solid rgb(0, 0, 0,0.5);'
+                if (deal.provious && dealProviousIndex < dealProviousLength && this.dealProviousList[dealProviousIndex].name == deal.name && this.dealProviousList[dealProviousIndex].id == deal.provious && this.dealProviousList[dealProviousIndex].dong == deal.dong) {
                     let dealProvious = this.dealProviousList[dealProviousIndex]
 
                     if ((options.date.min[0] > dealProvious.deal_year || (options.date.min[0] == dealProvious.deal_year && options.date.min[1] > dealProvious.deal_month)) ||
                         (options.date.max[0] < dealProvious.deal_year || (options.date.max[0] == dealProvious.deal_year && options.date.max[1] < dealProvious.deal_month))) {
-                        contextstyle = 'border: 2px solid rgb(0, 0, 0,0.5);'
+                        contextstyle = 'border: 1px solid rgb(0, 0, 0,1);'
                     }
                     else if (deal.deal_amount < dealProvious.deal_amount) {
                         let blue = 2 * (deal.deal_amount / dealProvious.deal_amount > 0.5 ? 1 - deal.deal_amount / dealProvious.deal_amount : 0.5);
                         // blue = 105 + parseInt(150 * blue);
                         // const green = 255 - blue;
                         // console.log('blue:', blue, ', green:', green);
-                        contextstyle = `border: 2px solid rgb(${blue * 255}, 0, 0,0.75);`;
+                        contextstyle = `border: 2px solid rgb(0, 0, ${parseInt(blue * 255)},0.75);`;
                     } else if (deal.deal_amount > dealProvious.deal_amount) {
                         let red = 2 * (deal.deal_amount / dealProvious.deal_amount < 1.5 ? deal.deal_amount / dealProvious.deal_amount - 1 : 0.5);
                         // red = 105 + parseInt(150 * red);
                         // const green = 255 - red;
                         // console.log('red:', red, ', green:', green);
-                        contextstyle = `border: 2px solid rgb(0, 0, ${255 * red},0.75);`;
+                        contextstyle = `border: 2px solid rgb(${parseInt(255 * red)}, 0, 0,0.75);`;
                     }
                     dealProviousIndex++;
                 }
