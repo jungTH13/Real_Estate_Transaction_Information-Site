@@ -38,11 +38,14 @@ export default {
       this.config
     );
     this.chart = myChart;
-    this.setGraphData(this.tradingVolumList);
+    this.switchSetGraphData(this.changeType);
   },
   computed: {
     tradingVolumList() {
       return this.$store.state.graph.tradingVolumList;
+    },
+    amountAVGList() {
+      return this.$store.state.graph.amountAVGList;
     },
     mapState() {
       return this.$store.state.dealList.mapState;
@@ -55,27 +58,52 @@ export default {
     },
     refreshMarker() {
       return this.$store.state.dealList.refreshMarker;
+    },
+    changeType() {
+      return this.$store.state.graph.changeType;
     }
   },
   watch: {
     dealList(newVal, oldVal) {
       this.loading = true;
-      this.setTradingVolumList();
+      this.switchSetGraphData(this.changeType);
     },
     tradingVolumList(newVal, oldVal) {
       this.setGraphData(newVal);
     },
+    amountAVGList(newVal, oldVal) {
+      this.setGraphData(newVal);
+    },
     refreshMarker(newVal, oldVal) {
-      this.setGraphData(this.tradingVolumList);
+      if (this.changeType === 0) {
+        this.setGraphData(this.tradingVolumList);
+      }
+      if (this.changeType === 1) {
+        this.setGraphData(this.amountAVGList);
+      }
+    },
+    changeType(newVal, oldVal) {
+      this.switchSetGraphData(newVal);
     }
 
   },
   methods: {
+    switchSetGraphData(changeType) {
+      if (changeType === 0) {
+        this.setTradingVolumList();
+      }
+      if (changeType === 1) {
+        this.setAmountAVGList();
+      }
+    },
     setDate(data) {
       return (`${data.deal_year}.${data.deal_month}`)
     },
     setTradingVolumList() {
       this.$store.dispatch('graph/setTradingVolum', this.mapState);
+    },
+    setAmountAVGList() {
+      this.$store.dispatch('graph/setAmountAVGList', this.mapState);
     },
     async setGraphData(tradingVolumList) {
       const labels = [];
@@ -86,10 +114,17 @@ export default {
         deal_year: dateInfo.min[0],
         deal_month: dateInfo.min[1]
       }
+      const totalList = [];
+      //changeType === 1
+      const totalAmountList = [];
+      const totalAreaList = [];
 
       while (dateInfo.max[0] > date.deal_year || (dateInfo.max[0] == date.deal_year && dateInfo.max[1] >= date.deal_month)) {
         labels.push(this.setDate(date))
         date.deal_month++;
+        totalList.push(0);
+        totalAmountList.push(0);
+        totalAreaList.push(0);
         if (date.deal_month > 12) {
           date.deal_year++;
           date.deal_month = 1;
@@ -106,14 +141,33 @@ export default {
           if ((dateInfo.min[0] < volumList[i].deal_year || (dateInfo.min[0] == volumList[i].deal_year && dateInfo.min[1] <= volumList[i].deal_month)) &&
             (dateInfo.max[0] > volumList[i].deal_year || (dateInfo.max[0] == volumList[i].deal_year && dateInfo.max[1] >= volumList[i].deal_month))) {
             let dong = volumList[i].dong;
-            let countList = [];
+            let dataList = [];
 
-            for (const date of labels) {
+            for (const [index, date] of labels.entries()) {
               if (volumList[i] && dong == volumList[i].dong && date == this.setDate(volumList[i])) {
-                countList.push((houseType['오피스텔'] ? volumList[i]['오피스텔'] : 0) + (houseType['아파트'] ? volumList[i]['아파트'] : 0) + (houseType['연립다세대'] ? volumList[i]['연립다세대'] : 0));
+                //changType에 따른 시각화 데이터 처리 분기
+                if (this.changeType === 0) {
+                  const count = (houseType['오피스텔'] ? volumList[i]['오피스텔'] : 0) + (houseType['아파트'] ? volumList[i]['아파트'] : 0) + (houseType['연립다세대'] ? volumList[i]['연립다세대'] : 0);
+                  dataList.push(count);
+                  console.log(count);
+                  totalList[index] += count;
+                }
+                else if (this.changeType === 1) {
+                  const amount = (houseType['오피스텔'] ? parseInt(volumList[i]['오피스텔amount']) || 0 : 0) + (houseType['아파트'] ? parseInt(volumList[i]['아파트amount']) || 0 : 0) + (houseType['연립다세대'] ? parseInt(volumList[i]['연립다세대amount']) || 0 : 0);
+                  const area = (houseType['오피스텔'] ? volumList[i]['오피스텔area'] : 0) + (houseType['아파트'] ? volumList[i]['아파트area'] : 0) + (houseType['연립다세대'] ? volumList[i]['연립다세대area'] : 0);
+                  totalAmountList[index] += amount;
+                  totalAreaList[index] += area;
+                  dataList.push(amount / area || dataList[dataList.length - 1] || 0);
+                }
                 i++;
               } else {
-                countList.push(0);
+                //changType에 따른 시각화 데이터 처리 분기
+                if (this.changeType === 0) {
+                  dataList.push(0);
+                }
+                else if (this.changeType === 1) {
+                  dataList.push(dataList[dataList.length - 1] || 0);
+                }
               }
             }
 
@@ -121,13 +175,29 @@ export default {
               label: dong,
               backgroundColor: '#2E495E00',
               borderColor: `rgb(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)})`,
-              data: countList
+              data: dataList
             });
           } else {
             i++;
           }
         }
       }
+
+      //changType에 따른 시각화 데이터 처리 분기
+      if (this.changeType === 1) {
+        for (const [index, data] of totalList.entries()) {
+          totalList[index] = totalAmountList[index] / totalAreaList[index] || totalList[index - 1] || 0;
+        }
+      }
+      console.log(totalList);
+      this.data.datasets.unshift({
+        label: '전체',
+        backgroundColor: '#2E495E00',
+        borderDash: [5, 5],
+        borderColor: `rgb(0, 0, 255)`,
+        data: totalList
+      });
+
       this.data.labels = labels;
       this.chart.update();
 

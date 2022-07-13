@@ -9,6 +9,9 @@
         <v-list-item-title style="text-align: center;">
           월별 거래량 및 평당 거래가
         </v-list-item-title>
+        <v-btn icon hide-details @click.stop="setGraphType">
+          <v-icon hide-details>mdi-swap-horizontal</v-icon>
+        </v-btn>
       </v-list-item>
 
       <v-divider></v-divider>
@@ -53,7 +56,9 @@ export default {
 
   },
   methods: {
-
+    setGraphType() {
+      this.$store.dispatch('graph/setChangeType');
+    }
   }
 }
 </script>
