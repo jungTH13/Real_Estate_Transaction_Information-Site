@@ -22,4 +22,10 @@ router.post('/traingVolum', async (req, res, next) => {
         .catch((error) => next(error));
 })
 
+router.post('/amountAVG', async (req, res, next) => {
+    await displayGraphController.monthlyTradingAmountAVG(Object.assign(app.locals.options, { body: req.body.mapState }))
+        .then((result) => res.json({ status: 200, data: result }))
+        .catch((error) => next(error));
+})
+
 module.exports = router;

@@ -89,4 +89,22 @@ module.exports = class {
             return RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.DB_FIND_ERROR);
         }
     }
+
+    async findMonthlyTradingAmountAVG(coordinate, locationList) {
+        validator.coordinate(coordinate);
+        const result = {};
+
+        try {
+            const promises = locationList.map(async (info) => {
+                const sgg_cd = info.sgg_cd;
+                const amountAVG = await this.repository.monthlyTradingAmountAVG(coordinate, sgg_cd);
+                result[sgg_cd] = amountAVG;
+            })
+
+            await Promise.all(promises);
+            return result;
+        } catch (error) {
+            return RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.DB_FIND_ERROR);
+        }
+    }
 }
