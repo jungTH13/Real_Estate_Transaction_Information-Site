@@ -107,4 +107,28 @@ module.exports = class {
             return RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.DB_FIND_ERROR);
         }
     }
+
+    async findLocationAndDong(coordinate, locationList) {
+        validator.coordinate(coordinate);
+        const result = [];
+
+        try {
+            const promises = locationList.map(async (info) => {
+                const sgg_cd = info.sgg_cd;
+                const sgg_nm = info.sgg_nm;
+                const dongList = await this.repository.findMatchedDong(coordinate, sgg_cd);
+                if (dongList.length) {
+                    result.push([sgg_nm]);
+                    for (const dong of dongList) {
+                        result.push([sgg_nm, dong.dong])
+                    }
+                }
+            })
+            await Promise.all(promises);
+            result.sort();
+            return result;
+        } catch (error) {
+            return RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.DB_FIND_ERROR);
+        }
+    }
 }

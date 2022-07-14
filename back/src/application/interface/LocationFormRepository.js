@@ -66,4 +66,9 @@ module.exports = class {
         // coordinate = {min_x,min_y,max_x,max_y}
         throw new Error('ERR_METHOD_NOT_IMPLEMENTED');
     }
+
+    async findMatchedDong(coordinate, sgg_cd) {
+        // coordinate = {min_x,min_y,max_x,max_y}
+        throw new Error('ERR_METHOD_NOT_IMPLEMENTED');
+    }
 }
