@@ -23,8 +23,6 @@ export const state = () => ({
 
 export const mutations = {
   setDeals(state, payload) {
-    // state.dealList.splice(0);
-    // state.dealList = payload;
     state.dealList.splice(0);
     state.dealProviousList.splice(0);
     state.dealList = payload.resultRecent || payload;
@@ -32,6 +30,7 @@ export const mutations = {
   },
   setMapState(state, payload) {
     state.mapState = payload;
+    console.log(payload);
   },
   setDate(state, date) {
     state.options.date.min = date.min;

@@ -7,6 +7,7 @@
 
 <script>
 import Chart from 'chart.js';
+
 export default {
   data() {
     return {
@@ -38,7 +39,9 @@ export default {
       this.config
     );
     this.chart = myChart;
-    this.switchSetGraphData(this.changeType);
+    if (!this.locationFixed) {
+      this.switchSetGraphData(this.changeType);
+    }
   },
   computed: {
     tradingVolumList() {
@@ -61,6 +64,9 @@ export default {
     },
     changeType() {
       return this.$store.state.graph.changeType;
+    },
+    locationFixed() {
+      return this.$store.state.location.locationFixed;
     }
   },
   watch: {
@@ -149,7 +155,6 @@ export default {
                 if (this.changeType === 0) {
                   const count = (houseType['오피스텔'] ? volumList[i]['오피스텔'] : 0) + (houseType['아파트'] ? volumList[i]['아파트'] : 0) + (houseType['연립다세대'] ? volumList[i]['연립다세대'] : 0);
                   dataList.push(count);
-                  console.log(count);
                   totalList[index] += count;
                 }
                 else if (this.changeType === 1) {

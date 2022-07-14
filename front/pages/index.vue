@@ -1,5 +1,8 @@
 <template>
     <v-app>
+        <div class="locationSelect">
+            <locationSelect @searchText="setPlace"></locationSelect>
+        </div>
         <div class="searchbox">
             <div class="funcBox">
                 <SearchResult></SearchResult>
@@ -47,6 +50,7 @@ import NaverMap from '~/components/NaverMap.vue'
 import SearchResult from '../components/searchResult.vue';
 import GroupSet from '../components/groupSet.vue';
 import Graph from '~/components/graph.vue';
+import locationSelect from '../components/locationSelect.vue';
 
 export default {
     data() {
@@ -80,19 +84,20 @@ export default {
         NaverMap,
         SearchResult,
         GroupSet,
-        Graph
+        Graph,
+        locationSelect
     },
     methods: {
+        setPlace(text) {
+            this.searchText = text;
+            this.searchPlace();
+        },
         searchPlace() {
             const keyword = this.searchText.trim();
             this.searchText = ''
             console.log(keyword)
             this.searchspot = keyword;
-            if (keyword.length === 0) {
-                return;
-            } else {
-                this.searchList = true;
-            }
+            setTimeout(() => { this.searchspot = ''; }, 100);
         },
         onChangeText(text) {
 
@@ -110,6 +115,19 @@ a {
     text-decoration: none;
 }
 
+.locationSelect {
+    position: absolute;
+    top: 65px;
+    left: 10px;
+    z-index: 10000;
+    background-color: #ffffff00;
+    overflow: scroll;
+    overflow-y: auto;
+    max-width: 100%;
+    height: 48px;
+    overflow-x: auto;
+}
+
 .navBar {
     position: absolute;
     top: 0;
@@ -122,7 +140,7 @@ a {
 
 .searchbox {
     position: absolute;
-    top: 100px;
+    top: 110px;
     left: 10px;
     z-index: 10000;
     background-color: #ffffff00;
