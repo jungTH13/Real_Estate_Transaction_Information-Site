@@ -36,6 +36,9 @@ export default {
         },
         refreshList() {
             return this.$store.state.dealList.refreshList;
+        },
+        locationFixed() {
+            return this.$store.state.location.locationFixed;
         }
     },
     watch: {
@@ -89,6 +92,9 @@ export default {
             let visibleList = [];
             let dealProviousIndex = 0;
             let dealProviousLength = this.dealProviousList.length;
+            if (this.locationFixed) {
+                this.removeMarker();
+            }
 
             const promises = dealList.map((deal, index) => {
                 if (options) {
@@ -170,7 +176,7 @@ export default {
             this.markers = [];
         },
         getMapState() {
-            if (!this.pause) {
+            if (!this.pause && !this.locationFixed) {
                 this.pause = true;
                 let map = this.map;
                 let oldPoint = { x: map.getCenter().x, y: map.getCenter().y };
@@ -231,7 +237,7 @@ export default {
 
         function initMap(zoom_label, getMapState) {
             map = new naver.maps.Map(document.getElementById('naverMap'), {
-                center: new naver.maps.LatLng(37.3595704, 127.105399),
+                center: new naver.maps.LatLng(37.5666103, 126.9783882),
                 zoom: zoom_label,
                 zoomControl: false,
                 zoomControlOptions: { position: naver.maps.Position.RIGHT_TOP },

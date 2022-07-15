@@ -1,6 +1,7 @@
 const express = require('express')
 const displayDealsController = require('../../../controllers/displayDealsController');
 const displayGraphController = require('../../../controllers/displayGraphController');
+const locationDealsController = require('../../../controllers/locationDealsController');
 
 const router = express.Router()
 
@@ -24,6 +25,12 @@ router.post('/traingVolum', async (req, res, next) => {
 
 router.post('/amountAVG', async (req, res, next) => {
     await displayGraphController.monthlyTradingAmountAVG(Object.assign(app.locals.options, { body: req.body.mapState }))
+        .then((result) => res.json({ status: 200, data: result }))
+        .catch((error) => next(error));
+})
+
+router.post('/searchLcationAndDong', async (req, res, next) => {
+    await locationDealsController.searchLocationAndDong(Object.assign(app.locals.options, { body: req.body.mapState }))
         .then((result) => res.json({ status: 200, data: result }))
         .catch((error) => next(error));
 })

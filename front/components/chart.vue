@@ -7,6 +7,7 @@
 
 <script>
 import Chart from 'chart.js';
+
 export default {
   data() {
     return {
@@ -61,6 +62,9 @@ export default {
     },
     changeType() {
       return this.$store.state.graph.changeType;
+    },
+    locationFixed() {
+      return this.$store.state.location.locationFixed;
     }
   },
   watch: {
@@ -89,11 +93,20 @@ export default {
   },
   methods: {
     switchSetGraphData(changeType) {
-      if (changeType === 0) {
-        this.setTradingVolumList();
-      }
-      if (changeType === 1) {
-        this.setAmountAVGList();
+      if (!this.locationFixed) {
+        if (changeType === 0) {
+          this.setTradingVolumList();
+        }
+        if (changeType === 1) {
+          this.setAmountAVGList();
+        }
+      } else {
+        if (changeType === 0) {
+          this.setGraphData(this.tradingVolumList);
+        }
+        if (changeType === 1) {
+          this.setGraphData(this.amountAVGList);
+        }
       }
     },
     setDate(data) {
@@ -149,7 +162,6 @@ export default {
                 if (this.changeType === 0) {
                   const count = (houseType['오피스텔'] ? volumList[i]['오피스텔'] : 0) + (houseType['아파트'] ? volumList[i]['아파트'] : 0) + (houseType['연립다세대'] ? volumList[i]['연립다세대'] : 0);
                   dataList.push(count);
-                  console.log(count);
                   totalList[index] += count;
                 }
                 else if (this.changeType === 1) {
@@ -189,14 +201,15 @@ export default {
           totalList[index] = totalAmountList[index] / totalAreaList[index] || totalList[index - 1] || 0;
         }
       }
-      console.log(totalList);
-      this.data.datasets.unshift({
-        label: '전체',
-        backgroundColor: '#2E495E00',
-        borderDash: [5, 5],
-        borderColor: `rgb(0, 0, 255)`,
-        data: totalList
-      });
+      if (this.data.datasets.length > 1) {
+        this.data.datasets.unshift({
+          label: '전체',
+          backgroundColor: '#2E495E00',
+          borderDash: [5, 5],
+          borderColor: `rgb(0, 0, 255)`,
+          data: totalList
+        });
+      }
 
       this.data.labels = labels;
       this.chart.update();

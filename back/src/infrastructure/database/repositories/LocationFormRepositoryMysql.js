@@ -125,6 +125,24 @@ module.exports = class extends LocationFormrepository {
         return results;
     }
 
+    async findDealsOfIdDong(idList, dong, ssg_cd) {
+        // 좌표기준 건물의 거래 내역중 가장 최근 거래 내역 한개만을 표시(house_type 무시)
+        const table = this.models[ssg_cd];
+        const options = {
+            where: {
+                id: { [Op.in]: idList }
+            },
+            order: [['provious', 'ASC']],
+            raw: true
+        }
+
+        if (dong) {
+            options.where.dong = dong;
+        }
+        const results = await table.findAll(options)
+        return results;
+    }
+
     async findProviousOfRecentlyDeals(deals, ssg_cd) {
         // 좌표기준 건물의 거래 내역중 가장 최근 거래 내역 한개만을 표시(house_type 무시)
         const idList = [];
@@ -171,8 +189,27 @@ module.exports = class extends LocationFormrepository {
                 y: { [Op.and]: [{ [Op.gt]: coordinate.min_y }, { [Op.lt]: coordinate.max_y }] }
             },
             group: ['dong', 'deal_year', 'deal_month'],
-            order: ['dong']
+            order: ['dong', 'deal_year', 'deal_month'],
+            raw: true
         })
+    }
+
+    async monthlyTradingVolumByDong(dong, sgg_cd) {
+        const options = {
+            attributes: ['dong', 'deal_year', 'deal_month', [this.sequelize.fn('COUNT', this.sequelize.col('house_type')), 'count'],
+                [this.sequelize.literal('COUNT(case when house_type=\'아파트\' then 1 end)'), '아파트'],
+                [this.sequelize.literal('COUNT(case when house_type=\'연립다세대\' then 1 end)'), '연립다세대'],
+                [this.sequelize.literal('COUNT(case when house_type=\'오피스텔\' then 1 end)'), '오피스텔']
+            ],
+            where: {},
+            group: ['dong', 'deal_year', 'deal_month'],
+            order: ['dong', 'deal_year', 'deal_month'],
+            raw: true
+        }
+        if (dong) {
+            options.where.dong = dong;
+        }
+        return await this.models[sgg_cd].findAll(options)
     }
 
     async monthlyTradingAmountAVG(coordinate, sgg_cd) {
@@ -190,6 +227,40 @@ module.exports = class extends LocationFormrepository {
                 y: { [Op.and]: [{ [Op.gt]: coordinate.min_y }, { [Op.lt]: coordinate.max_y }] }
             },
             group: ['dong', 'deal_year', 'deal_month'],
+            order: ['dong', 'deal_year', 'deal_month'],
+            raw: true
+        })
+    }
+
+    async monthlyTradingAmountAVGByDong(dong, sgg_cd) {
+        const options = {
+            attributes: ['dong', 'deal_year', 'deal_month',
+                [this.sequelize.literal('SUM(case when house_type=\'아파트\' then deal_amount end)'), '아파트amount'],
+                [this.sequelize.literal('sum(case when house_type=\'아파트\' then area end)'), '아파트area'],
+                [this.sequelize.literal('SUM(case when house_type=\'연립다세대\' then deal_amount end)'), '연립다세대amount'],
+                [this.sequelize.literal('sum(case when house_type=\'연립다세대\' then area end)'), '연립다세대area'],
+                [this.sequelize.literal('SUM(case when house_type=\'오피스텔\' then deal_amount end)'), '오피스텔amount'],
+                [this.sequelize.literal('sum(case when house_type=\'오피스텔\' then area end)'), '오피스텔area']
+            ],
+            where: {},
+            group: ['dong', 'deal_year', 'deal_month'],
+            order: ['dong', 'deal_year', 'deal_month'],
+            raw: true
+        }
+        if (dong) {
+            options.where.dong = dong;
+        }
+        return await this.models[sgg_cd].findAll(options)
+    }
+
+    async findMatchedDong(coordinate, sgg_cd) {
+        return await this.models[sgg_cd].findAll({
+            attribute: ['dong'],
+            where: {
+                x: { [Op.and]: [{ [Op.gt]: coordinate.min_x }, { [Op.lt]: coordinate.max_x }] },
+                y: { [Op.and]: [{ [Op.gt]: coordinate.min_y }, { [Op.lt]: coordinate.max_y }] }
+            },
+            group: ['dong'],
             order: ['dong']
         })
     }

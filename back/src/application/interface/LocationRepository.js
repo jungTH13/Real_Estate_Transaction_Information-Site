@@ -7,6 +7,10 @@ module.exports = class Location {
         throw new Error('ERR_METHOD_NOT_IMPLEMENTED');
     }
 
+    async findOneByName(sgg_nm) {
+        throw new Error('ERR_METHOD_NOT_IMPLEMENTED');
+    }
+
     async XYupdate(coordinate, sgg_cd) {
         // coordinate = {min_x,min_y,max_x,max_y}
         throw new Error('ERR_METHOD_NOT_IMPLEMENTED');

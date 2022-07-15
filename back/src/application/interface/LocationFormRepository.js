@@ -42,6 +42,10 @@ module.exports = class {
         throw new Error('ERR_METHOD_NOT_IMPLEMENTED');
     }
 
+    async findDealsOfIdDong(idList, dong, ssg_cd) {
+        throw new Error('ERR_METHOD_NOT_IMPLEMENTED');
+    }
+
     async findMaxOne(attribute, sgg_cd) {
         // only [int,float] type attribute is available
         throw new Error('ERR_METHOD_NOT_IMPLEMENTED');
@@ -62,7 +66,20 @@ module.exports = class {
         throw new Error('ERR_METHOD_NOT_IMPLEMENTED');
     }
 
+    async monthlyTradingVolumByDong(dong, sgg_cd) {
+        throw new Error('ERR_METHOD_NOT_IMPLEMENTED');
+    }
+
     async monthlyTradingAmountAVG(coordinate, sgg_cd) {
+        // coordinate = {min_x,min_y,max_x,max_y}
+        throw new Error('ERR_METHOD_NOT_IMPLEMENTED');
+    }
+
+    async monthlyTradingAmountAVGByDong(coordinate, sgg_cd) {
+        throw new Error('ERR_METHOD_NOT_IMPLEMENTED');
+    }
+
+    async findMatchedDong(coordinate, sgg_cd) {
         // coordinate = {min_x,min_y,max_x,max_y}
         throw new Error('ERR_METHOD_NOT_IMPLEMENTED');
     }

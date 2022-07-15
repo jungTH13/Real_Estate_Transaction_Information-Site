@@ -10,6 +10,7 @@ const { logger } = require('../../config/winston');
 const RESPONSE = require('../../config/responseState');
 
 const dealRouter = require('./routes');
+const locationFixedRouter = require('./routes/locationFixed');
 
 app = express();
 dotenv.config();
@@ -45,8 +46,10 @@ module.exports = async (port = 7000, options) => {
     app.use(passport.session());
 
     app.use('/', dealRouter);
+    app.use('/locationFixed', locationFixedRouter);
 
     app.use((req, res, next) => {
+        logger.warn(`존재하지 않는 route 호출(URL:${req.url})`)
         next(RESPONSE.ROUTE_NOT_FIND);
     });
 
@@ -58,7 +61,8 @@ module.exports = async (port = 7000, options) => {
             logger.error({
                 code: err.code,
                 message: err.message,
-                detail: `${error}`
+                detail: `${error}`,
+                stack: `${error.stack}`
             })
             res.status(500).json(err);
         }

@@ -17,6 +17,12 @@ module.exports = class extends LocationRepository {
         });
     }
 
+    async findOneByName(sgg_nm) {
+        return await this.model.findOne({
+            where: { sgg_nm }
+        });
+    }
+
     async XYupdate(coordinate, sgg_cd) {
         return await this.model.update({
             min_x: coordinate.min_x,

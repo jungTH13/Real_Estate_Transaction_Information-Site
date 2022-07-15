@@ -23,8 +23,6 @@ export const state = () => ({
 
 export const mutations = {
   setDeals(state, payload) {
-    // state.dealList.splice(0);
-    // state.dealList = payload;
     state.dealList.splice(0);
     state.dealProviousList.splice(0);
     state.dealList = payload.resultRecent || payload;
@@ -32,6 +30,7 @@ export const mutations = {
   },
   setMapState(state, payload) {
     state.mapState = payload;
+    console.log(payload);
   },
   setDate(state, date) {
     state.options.date.min = date.min;
@@ -63,6 +62,19 @@ export const actions = {
   async setDeals({ commit }, payload) {
     await this.$axios.post('http://127.0.0.1:7000/proviousDeal', {
       mapState: payload
+    })
+      .then(async (res) => {
+        commit('setDeals', res.data.data);
+        commit('setMapState', payload);
+      })
+      .catch((error) => {
+        console.error(error);
+        commit('setMapState', payload);
+      })
+  },
+  async setDealsByLocation({ commit }, payload) {
+    await this.$axios.post('http://127.0.0.1:7000/locationFixed/proviousDeal', {
+      location: payload
     })
       .then(async (res) => {
         commit('setDeals', res.data.data);
