@@ -6,8 +6,11 @@
         <v-btn icon hide-details @click.stop="search = !search">
           <v-icon hide-details>mdi-chart-line</v-icon>
         </v-btn>
-        <v-list-item-title style="text-align: center;">
-          월별 거래량 및 평당 거래가
+        <v-list-item-title v-if="changeType === 0" style="text-align: center;">
+          월별 거래량 (건)
+        </v-list-item-title>
+        <v-list-item-title v-if="changeType === 1" style="text-align: center;">
+          평당 거래가 (만원)
         </v-list-item-title>
         <v-btn icon hide-details @click.stop="setGraphType">
           <v-icon hide-details>mdi-swap-horizontal</v-icon>
@@ -50,6 +53,9 @@ export default {
     },
     refreshList() {
       return this.$store.state.dealList.refreshList;
+    },
+    changeType() {
+      return this.$store.state.graph.changeType;
     }
   },
   watch: {

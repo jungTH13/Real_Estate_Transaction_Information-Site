@@ -92,6 +92,9 @@ export default {
             let visibleList = [];
             let dealProviousIndex = 0;
             let dealProviousLength = this.dealProviousList.length;
+            if (this.locationFixed) {
+                this.removeMarker();
+            }
 
             const promises = dealList.map((deal, index) => {
                 if (options) {

@@ -39,9 +39,7 @@ export default {
       this.config
     );
     this.chart = myChart;
-    if (!this.locationFixed) {
-      this.switchSetGraphData(this.changeType);
-    }
+    this.switchSetGraphData(this.changeType);
   },
   computed: {
     tradingVolumList() {
@@ -95,11 +93,20 @@ export default {
   },
   methods: {
     switchSetGraphData(changeType) {
-      if (changeType === 0) {
-        this.setTradingVolumList();
-      }
-      if (changeType === 1) {
-        this.setAmountAVGList();
+      if (!this.locationFixed) {
+        if (changeType === 0) {
+          this.setTradingVolumList();
+        }
+        if (changeType === 1) {
+          this.setAmountAVGList();
+        }
+      } else {
+        if (changeType === 0) {
+          this.setGraphData(this.tradingVolumList);
+        }
+        if (changeType === 1) {
+          this.setGraphData(this.amountAVGList);
+        }
       }
     },
     setDate(data) {
@@ -194,14 +201,15 @@ export default {
           totalList[index] = totalAmountList[index] / totalAreaList[index] || totalList[index - 1] || 0;
         }
       }
-      console.log(totalList);
-      this.data.datasets.unshift({
-        label: '전체',
-        backgroundColor: '#2E495E00',
-        borderDash: [5, 5],
-        borderColor: `rgb(0, 0, 255)`,
-        data: totalList
-      });
+      if (this.data.datasets.length > 1) {
+        this.data.datasets.unshift({
+          label: '전체',
+          backgroundColor: '#2E495E00',
+          borderDash: [5, 5],
+          borderColor: `rgb(0, 0, 255)`,
+          data: totalList
+        });
+      }
 
       this.data.labels = labels;
       this.chart.update();
