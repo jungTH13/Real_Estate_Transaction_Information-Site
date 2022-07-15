@@ -40,13 +40,19 @@ export default {
                 this.$store.dispatch('location/setLocationFixed', true);
                 const searchText = this.locationTableList[newVal].join('');
                 this.$emit('searchText', searchText);
+
+                this.$store.dispatch('dealList/setDealsByLocation', this.locationTableList[newVal])
+                this.$store.dispatch('graph/setTradingVolumByLocation', this.locationTableList[newVal])
+                this.$store.dispatch('graph/setAmountAVGListByLocation', this.locationTableList[newVal])
             } else {
                 this.$store.dispatch('location/setLocationFixed', false);
             }
             console.log(newVal)
         },
         dealList(newVal, oldVal) {
-            this.setLocationTableList();
+            if (!this.locationFixed) {
+                this.setLocationTableList();
+            }
         },
     },
     methods: {
