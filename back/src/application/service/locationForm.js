@@ -55,6 +55,20 @@ module.exports = class {
         }
     }
 
+    async findProviousOfRecentlyDealsByLocationFixed(year, month, location, dong) {
+        const sgg_cd = location.sgg_cd;
+        try {
+            const dealsRecentIdList = await this.repository.findRecentlyDealsId(year, month, sgg_cd);
+            const dealsRecent = await this.repository.findDealsOfIdDong(dealsRecentIdList, dong, sgg_cd);
+
+            const dealsProvious = await this.repository.findProviousOfRecentlyDeals(dealsRecent, sgg_cd);
+
+            return { resultRecent: dealsRecent, resultProvious: dealsProvious };
+        } catch (error) {
+            RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.DB_FIND_ERROR);
+        }
+    }
+
     async findMaxMinCoordinate(sgg_cd) {
         try {
             const max_x = await this.repository.findMaxOne('x', sgg_cd);
@@ -90,6 +104,18 @@ module.exports = class {
         }
     }
 
+    async findMonthlyTradingVolumByLocationFixed(dong, location) {
+        const result = {};
+        const sgg_cd = location.sgg_cd;
+        try {
+            const tradingVolum = await this.repository.monthlyTradingVolumByDong(dong, sgg_cd);
+            result[sgg_cd] = tradingVolum;
+            return result;
+        } catch (error) {
+            return RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.DB_FIND_ERROR);
+        }
+    }
+
     async findMonthlyTradingAmountAVG(coordinate, locationList) {
         validator.coordinate(coordinate);
         const result = {};
@@ -102,6 +128,18 @@ module.exports = class {
             })
 
             await Promise.all(promises);
+            return result;
+        } catch (error) {
+            return RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.DB_FIND_ERROR);
+        }
+    }
+
+    async findMonthlyTradingAmountAVGByLocationFixed(dong, location) {
+        const result = {};
+        const sgg_cd = location.sgg_cd;
+        try {
+            const amountAVG = await this.repository.monthlyTradingAmountAVGByDong(dong, sgg_cd);
+            result[sgg_cd] = amountAVG;
             return result;
         } catch (error) {
             return RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.DB_FIND_ERROR);

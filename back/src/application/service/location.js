@@ -39,4 +39,12 @@ module.exports = class {
             RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.DB_FIND_ERROR);
         }
     }
+
+    async findOneByName(location) {
+        try {
+            return await this.repository.findOneByName(location);
+        } catch (error) {
+            RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.DB_FIND_ERROR);
+        }
+    }
 }

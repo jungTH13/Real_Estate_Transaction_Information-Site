@@ -20,3 +20,44 @@ exports.searchLocationAndDong = async (options) => {
         RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.CONTROLLER_ERROR_NAME('searchLocationAndDong'))
     }
 }
+
+exports.ProviousOfRecentlyDeals = async (options) => {
+    const locationService = new LocationService(options.locationRepository);
+    const locationFormService = new LocationFormService(options.locationFormRepository);
+    const locationName = options.body.location[0];
+    const locationDong = options.body.location[1];
+    const year = options.body.year || new Date().getFullYear();
+    const month = options.body.month || new Date().getMonth() + 1;
+    try {
+        const location = await locationService.findOneByName(locationName);
+        return await locationFormService.findProviousOfRecentlyDealsByLocationFixed(year, month, location, locationDong);
+    } catch (error) {
+        RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.CONTROLLER_ERROR_NAME('ProviousOfRecentlyDeals'))
+    }
+}
+
+exports.monthlyTradingVolum = async (options) => {
+    const locationService = new LocationService(options.locationRepository);
+    const locationFormService = new LocationFormService(options.locationFormRepository);
+    const locationName = options.body.location[0];
+    const locationDong = options.body.location[1];
+    try {
+        const location = await locationService.findOneByName(locationName);
+        return await locationFormService.findMonthlyTradingVolumByLocationFixed(locationDong, location);
+    } catch (error) {
+        RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.CONTROLLER_ERROR_NAME('monthlyTradingVolum'))
+    }
+}
+
+exports.monthlyTradingAmountAVG = async (options) => {
+    const locationService = new LocationService(options.locationRepository);
+    const locationFormService = new LocationFormService(options.locationFormRepository);
+    const locationName = options.body.location[0];
+    const locationDong = options.body.location[1];
+    try {
+        const location = await locationService.findOneByName(locationName);
+        return await locationFormService.findMonthlyTradingAmountAVGByLocationFixed(locationDong, location);
+    } catch (error) {
+        RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.CONTROLLER_ERROR_NAME('monthlyTradingAmountAVG'))
+    }
+}
