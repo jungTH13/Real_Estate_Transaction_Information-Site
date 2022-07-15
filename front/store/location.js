@@ -15,7 +15,7 @@ export const mutations = {
 
 export const actions = {
     async setLocationTableList({ commit }, payload) {
-        await this.$axios.post('http://127.0.0.1:7000/searchLcationAndDong', {
+        await this.$axios.post('http://127.0.0.1:7000/locationFixed/searchLocationAndDong', {
             mapState: payload
         })
             .then(async (res) => {

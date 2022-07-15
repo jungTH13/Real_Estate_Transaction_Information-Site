@@ -40,6 +40,28 @@ export const actions = {
                 console.error(error);
             })
     },
+    async setTradingVolumByLocation({ commit }, payload) {
+        await this.$axios.post('http://127.0.0.1:7000/locationFixed/traingVolum', {
+            location: payload
+        })
+            .then(async (res) => {
+                commit('setTradingVolum', res.data.data)
+            })
+            .catch((error) => {
+                console.error(error);
+            })
+    },
+    async setAmountAVGListByLocation({ commit }, payload) {
+        await this.$axios.post('http://127.0.0.1:7000/locationFixed/amountAVG', {
+            location: payload
+        })
+            .then(async (res) => {
+                commit('setAmountAVGList', res.data.data)
+            })
+            .catch((error) => {
+                console.error(error);
+            })
+    },
     async setChangeType({ commit }, payload) {
         commit('setChangeType')
     }

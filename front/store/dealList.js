@@ -72,6 +72,19 @@ export const actions = {
         commit('setMapState', payload);
       })
   },
+  async setDealsByLocation({ commit }, payload) {
+    await this.$axios.post('http://127.0.0.1:7000/locationFixed/proviousDeal', {
+      location: payload
+    })
+      .then(async (res) => {
+        commit('setDeals', res.data.data);
+        commit('setMapState', payload);
+      })
+      .catch((error) => {
+        console.error(error);
+        commit('setMapState', payload);
+      })
+  },
   setMapState({ commit }, payload) {
     commit('setMapState', payload);
   },
