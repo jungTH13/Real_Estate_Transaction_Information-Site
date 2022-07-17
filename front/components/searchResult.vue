@@ -12,8 +12,8 @@
         <v-list-item-title style="text-align: center;">
           <v-form @submit.prevent="searchName">
             <v-card :style="{ display: 'flex', height: '100%', alignItems: 'center', padding: '0px 0px 3px 10px' }">
-              <v-text-field v-model="searchText" label="검색" hide-details :style="{ display: 'flex', alignItems: 'center' }"
-                @input="onChangeText" />
+              <v-text-field v-model="searchText" label="검색" hide-details
+                :style="{ display: 'flex', alignItems: 'center' }" @input="onChangeText" />
             </v-card>
           </v-form>
         </v-list-item-title>
@@ -22,16 +22,36 @@
       <v-divider></v-divider>
 
       <v-list dense v-if="!search">
+        <!-- 검색된 거래정보에서 name을 기준으로 검색시 표시 영역 -->
+        <div v-if="resultBoxType === 1" style="min-height: 300px; max-height: 300px; overflow:auto;"
+          class="subDealListBox" id="subDealListBox">
+          <v-list-item v-for="i in subSearchDealList" v-if="dealList[i]" :key="i" link class="searchResult">
+            <v-list-item-content>
+              <v-list-item-title style="font-weight:700">{{ dealList[i].name }}</v-list-item-title>
+              <tr>
+                <td><span style="font-size:3px;color:blue;">{{ dealList[i].house_type }} </span></td>
+                <td style="position:absolute; left:70px; bottom:9px;"><span style="font-size:3px;">{{ dealList[i].area
+                }}㎡</span></td>
+                <td style="position:absolute; left:170px; bottom:9px"><span style="font-size:3px;">{{
+                    amountToString(dealList[i].deal_amount)
+                }}</span></td>
+              </tr>
+            </v-list-item-content>
+          </v-list-item>
+        </div>
+
+        <!-- 검색된 거래정보 표시 영역 -->
         <div style="min-height: 300px; max-height: 300px; overflow:auto;" class="dealListBox" id="dealListBox">
           <v-list-item v-for="i in searchDealList" v-if="dealList[i]" :key="i" link class="searchResult">
             <v-list-item-content>
               <v-list-item-title style="font-weight:700">{{ dealList[i].name }}</v-list-item-title>
               <tr>
                 <td><span style="font-size:3px;color:blue;">{{ dealList[i].house_type }} </span></td>
-                <td style="position:absolute; left:70px; bottom:9px;"><span
-                    style="font-size:3px;">{{ dealList[i].area }}㎡</span></td>
-                <td style="position:absolute; left:170px; bottom:9px"><span
-                    style="font-size:3px;">{{ amountToString(dealList[i].deal_amount) }}</span></td>
+                <td style="position:absolute; left:70px; bottom:9px;"><span style="font-size:3px;">{{ dealList[i].area
+                }}㎡</span></td>
+                <td style="position:absolute; left:170px; bottom:9px"><span style="font-size:3px;">{{
+                    amountToString(dealList[i].deal_amount)
+                }}</span></td>
               </tr>
             </v-list-item-content>
           </v-list-item>
@@ -55,6 +75,8 @@ export default {
       searchText: '',
       refresh: false,
       searchDealList: [],
+      subSearchDealList: [],
+      resultBoxType: 0,
     }
   },
   mounted() {
@@ -85,11 +107,24 @@ export default {
         } else {
           setTimeout(this.onScroll, 100);
         }
+        this.searchText = '';
       }
     },
     search(newVal, oldVal) {
       if (!newVal) {
+        this.searchDealList.splice(0);
         setTimeout(this.onScroll, 100);
+        this.searchText = '';
+      }
+    },
+    searchText(newVal, oldVal) {
+      if (newVal.length === 0) {
+        this.resultBoxType = 0;
+        if (document.getElementById('dealListBox')) {
+          document.getElementById('dealListBox').style.display = "block";
+        }
+      } else {
+        document.getElementById('dealListBox').style.display = "none";
       }
     }
   },
@@ -100,9 +135,18 @@ export default {
     async onScroll() {
       let target = document.getElementById('dealListBox');
 
-      if (target.scrollHeight - 300 < target.clientHeight + target.scrollTop) {
+      if (this.resultBoxType === 0 && target.scrollHeight - 300 < target.clientHeight + target.scrollTop) {
         if (this.visibleDealsIndex.length > this.searchDealList.length) {
           await this.addDealList();
+        }
+      }
+    },
+    async searchOnScroll(text) {
+      let target = document.getElementById('searchDealListBox');
+      this.subSearchDealList.splice(0);
+      for (const index of this.visibleDealsIndex) {
+        if (0 <= this.dealList[index].name.indexOf(text)) {
+          this.subSearchDealList.push(index);
         }
       }
     },
@@ -121,7 +165,10 @@ export default {
       console.log("searchDealList:", this.searchDealList.length)
     },
     onChangeText(text) {
-
+      if (text.length) {
+        this.resultBoxType = 1;
+        this.searchOnScroll(text);
+      }
     },
     amountToString(amount) {
       let result = '';
@@ -146,11 +193,16 @@ export default {
 
 .searchResult {
   scrollbar-width: none;
-  background-color: #ffffffaa;
+  background-color: #00000000;
 }
 
 .invisible {
   background-color: #00000000;
+}
+
+.subDealListBox {
+  height: 300px;
+  width: 300px;
 }
 
 #searchCount {
@@ -167,6 +219,11 @@ export default {
 }
 
 #dealListBox::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, Opera*/
+}
+
+#subDealListBox::-webkit-scrollbar {
   display: none;
   /* Chrome, Safari, Opera*/
 }
