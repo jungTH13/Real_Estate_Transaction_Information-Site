@@ -41,6 +41,7 @@
             </v-toolbar>
         </nav>
         <NaverMap :search="searchspot"></NaverMap>
+        <selectDealinfo style="position:absolute; top:0px; left:0px;"></selectDealinfo>
     </v-app>
 
 </template>
@@ -51,6 +52,7 @@ import SearchResult from '../components/searchResult.vue';
 import GroupSet from '../components/groupSet.vue';
 import Graph from '~/components/graph.vue';
 import locationSelect from '../components/locationSelect.vue';
+import selectDealinfo from '../components/selectDealinfo.vue';
 
 export default {
     data() {
@@ -85,7 +87,8 @@ export default {
         SearchResult,
         GroupSet,
         Graph,
-        locationSelect
+        locationSelect,
+        selectDealinfo
     },
     methods: {
         setPlace(text) {

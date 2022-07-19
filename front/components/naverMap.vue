@@ -39,6 +39,9 @@ export default {
         },
         locationFixed() {
             return this.$store.state.location.locationFixed;
+        },
+        locationTableList() {
+            return this.$store.state.location.locationTableList;
         }
     },
     watch: {
@@ -59,32 +62,14 @@ export default {
         }
     },
     methods: {
-        setContent(type = 0) {
-            if (type = 0) {
-                return `
-                        <div class="marker" alt="">
-                        <div style="font-size:10px">
-                        ${this.setAmount(deal.deal_amount)}
-                        <div>
-                        <div style="font-size:7px">
-                        ${deal.area}㎡
-                        <div>
-                        <div style="font-size:7px">
-                        ${deal.name}
-                        <div>
-                        </div>
-                       `
-            }
-        },
         setAmount(amount) {
             let result = '';
             let a = parseInt(amount / 10000);
-            let b = amount % 10000;
-            if (a) {
-                result += `${a}억`
-            }
-            if (b) {
-                result += `${b}만`
+            let b = ((amount % 10000) / 10000);
+            if (b <= 0) {
+                result = `${a}억`;
+            } else {
+                result = `${Math.round((a + b) * 100) / 100}억`
             }
             return result
         },
@@ -112,40 +97,50 @@ export default {
                 }
                 visibleList.push(index);
                 deal.visible = true;
-                let contextstyle = 'border: 1px solid rgb(0, 0, 0,0.5);'
+                let percentText = '';
+                let contextstyle = 'border: 1px solid rgb(0, 0, 0, 0.25);'
                 if (deal.provious && dealProviousIndex < dealProviousLength && this.dealProviousList[dealProviousIndex].name == deal.name && this.dealProviousList[dealProviousIndex].id == deal.provious && this.dealProviousList[dealProviousIndex].dong == deal.dong) {
                     let dealProvious = this.dealProviousList[dealProviousIndex]
 
                     if ((options.date.min[0] > dealProvious.deal_year || (options.date.min[0] == dealProvious.deal_year && options.date.min[1] > dealProvious.deal_month)) ||
                         (options.date.max[0] < dealProvious.deal_year || (options.date.max[0] == dealProvious.deal_year && options.date.max[1] < dealProvious.deal_month))) {
-                        contextstyle = 'border: 1px solid rgb(0, 0, 0,1);'
+                        contextstyle = 'border: 1px solid rgb(0, 0, 0,0.25);'
                     }
                     else if (deal.deal_amount < dealProvious.deal_amount) {
                         let blue = 2 * (deal.deal_amount / dealProvious.deal_amount > 0.5 ? 1 - deal.deal_amount / dealProvious.deal_amount : 0.5);
                         // blue = 105 + parseInt(150 * blue);
                         // const green = 255 - blue;
                         // console.log('blue:', blue, ', green:', green);
-                        contextstyle = `border: 2px solid rgb(0, 0, ${parseInt(blue * 255)},0.75);`;
-                    } else if (deal.deal_amount > dealProvious.deal_amount) {
+                        contextstyle = (blue < 0.1 ? `border: 2px solid rgb(0, 255, 0,0.25);` : `border: 2px solid rgb(0, 0, 255,${blue});`);
+                        percentText = `
+                        <div style="font-size:10px; color:blue; position:absolute; font-weight:900; bottom:1px; left:1px;">
+                            ${Math.round((deal.deal_amount / dealProvious.deal_amount) * 100 - 100)}%↓
+                        </div>
+                        `
+                    }
+                    else if (deal.deal_amount > dealProvious.deal_amount) {
                         let red = 2 * (deal.deal_amount / dealProvious.deal_amount < 1.5 ? deal.deal_amount / dealProvious.deal_amount - 1 : 0.5);
                         // red = 105 + parseInt(150 * red);
                         // const green = 255 - red;
                         // console.log('red:', red, ', green:', green);
-                        contextstyle = `border: 2px solid rgb(${parseInt(255 * red)}, 0, 0,0.75);`;
+                        contextstyle = (red < 0.1 ? `border: 2px solid rgb(0, 255, 0,0.25);` : `border: 2px solid rgb(255, 0, 0,${red});`);
+                        percentText = `
+                        <div style="font-size:10px; color:red; position:absolute; font-weight:900; bottom:1px; left:1px;">
+                            ${Math.round((deal.deal_amount / dealProvious.deal_amount) * 100 - 100)}%↑
+                        </div>
+                        `
                     }
                     dealProviousIndex++;
                 }
                 let contentText = `
-                        <div class="marker" style="${contextstyle}" alt="">
-                        <div style="font-size:10px; margin:0px">
-                        ${this.setAmount(deal.deal_amount)}
-                        <div>
-                        <div style="font-size:7px">
-                        ${deal.area}㎡
-                        <div>
-                        <div style="font-size:7px">
-                        ${deal.name}
-                        <div>
+                        <div class="marker" style="${contextstyle}" onclick='dealDetail(${index})'>
+                            <div style="font-size:15px; position:absolute; top:2px; font-weight:900; left:2px;">
+                            ${this.setAmount(deal.deal_amount)}
+                            </div>
+                            <div style="font-size:10px; position:absolute; font-weight:900; bottom:1px; right:1px;">
+                            ${Math.round(deal.area)}㎡
+                            </div>
+                            ${percentText}
                         </div>
                        `;
                 this.markers.push(new naver.maps.Marker({
@@ -167,6 +162,15 @@ export default {
                 });
 
 
+        },
+        dealDetail(dealIndex) {
+            const deal = this.dealList[dealIndex];
+            for (const location of this.locationTableList) {
+                if (location[1] && location[1] == deal.dong) {
+                    this.$store.dispatch('location/selectDealLocation', location.concat([deal.name]));
+                    return;
+                }
+            }
         },
         removeMarker() {
             this.markers.forEach((marker) => {
@@ -235,6 +239,8 @@ export default {
         initMap(zoom_label, this.getMapState);
         this.map = map;
 
+        window.dealDetail = this.dealDetail;
+
         function initMap(zoom_label, getMapState) {
             map = new naver.maps.Map(document.getElementById('naverMap'), {
                 center: new naver.maps.LatLng(37.5666103, 126.9783882),
@@ -273,8 +279,8 @@ export default {
     padding: 0.5rem;
     line-height: 1rem;
     border-radius: 0.5rem;
-    width: 55px;
-    height: 25px;
+    width: 45px;
+    height: 20px;
 }
 
 .markerup {
@@ -305,12 +311,10 @@ export default {
 
 .marker:hover {
     position: absolute;
-    background-color: #ffffffcc;
+    background-color: #f06ec9ad;
     border: 2px solid rgb(0, 0, 0);
     padding: 0.5rem;
     line-height: 1rem;
     border-radius: 0.5rem;
-    width: 100px;
-    height: 100px;
 }
 </style>

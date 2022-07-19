@@ -1,6 +1,7 @@
 <template>
   <div class="invisible">
-    <v-navigation-drawer v-model="drawer" :mini-variant.sync="search" permanent class="searchList" id="box">
+    <v-navigation-drawer v-model="drawer" :mini-variant.sync="search" permanent :width="280" class="searchList"
+      id="box">
 
       <v-list-item class="searchTitle" style="padding:0px 10px 0px 10px">
         <v-btn icon hide-details @click.stop="search = !search">
@@ -32,13 +33,13 @@
             <v-icon>mdi-home-city</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-row align="center" justify="space-around">
+            <v-row align="center" justify="space-around" style="margin:1px;">
               <v-card v-for="typeName in ['오피스텔', '아파트', '연립다세대']" :key="typeName">
-                <v-btn style="width:10px; height:30px" v-if="options.type[typeName]" depressed color="primary"
-                  @click="changType(typeName)">
+                <v-btn style=" min-width:10px; max-width:60px; height:30px" v-if="options.type[typeName]" depressed
+                  color="primary" @click="changType(typeName)">
                   <span style="font-size:2px;">{{ typeName }}</span>
                 </v-btn>
-                <v-btn style="width:10px; height:30px" v-if="!options.type[typeName]" depressed
+                <v-btn style=" min-width:10px; max-width:60px; height:30px" v-if="!options.type[typeName]" depressed
                   @click="changType(typeName)">
                   <span style="font-size:2px;">{{ typeName }}</span>
                 </v-btn>

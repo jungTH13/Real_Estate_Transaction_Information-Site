@@ -61,3 +61,17 @@ exports.monthlyTradingAmountAVG = async (options) => {
         RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.CONTROLLER_ERROR_NAME('monthlyTradingAmountAVG'))
     }
 }
+
+exports.selectDealInfo = async (options) => {
+    const locationService = new LocationService(options.locationRepository);
+    const locationFormService = new LocationFormService(options.locationFormRepository);
+    const locationName = options.body.location[0];
+    const locationDong = options.body.location[1];
+    const dealName = options.body.location[2];
+    try {
+        const location = await locationService.findOneByName(locationName);
+        return await locationFormService.findDealInfo(locationDong, dealName, location);
+    } catch (error) {
+        RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.CONTROLLER_ERROR_NAME('selectDealInfo'))
+    }
+}

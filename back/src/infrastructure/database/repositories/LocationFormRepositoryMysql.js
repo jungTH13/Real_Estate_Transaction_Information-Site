@@ -264,4 +264,14 @@ module.exports = class extends LocationFormrepository {
             order: ['dong']
         })
     }
+
+    async findDealInfo(dong, name, sgg_cd) {
+        return await this.models[sgg_cd].findAll({
+            where: {
+                name,
+                dong
+            },
+            order: [['deal_year', 'DESC'], ['deal_month', 'DESC'], ['deal_day', 'DESC']]
+        })
+    }
 }

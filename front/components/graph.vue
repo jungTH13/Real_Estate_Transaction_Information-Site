@@ -1,6 +1,6 @@
 <template>
   <div class="invisible">
-    <v-navigation-drawer v-model="drawer" :mini-variant.sync="search" permanent :width="600" id="box">
+    <v-navigation-drawer v-model="drawer" :mini-variant.sync="search" permanent :width="chartWidth" id="box">
 
       <v-list-item class="searchTitle" style="padding:0px 10px 0px 10px;">
         <v-btn icon hide-details @click.stop="search = !search">
@@ -19,7 +19,7 @@
 
       <v-divider></v-divider>
 
-      <div v-if="!search" class="chart">
+      <div v-if="!search">
         <Chart></Chart>
       </div>
 
@@ -36,6 +36,7 @@ export default {
 
   data() {
     return {
+      chartWidth: 600,
       drawer: true,
       search: true,
       mini: true,
@@ -56,10 +57,19 @@ export default {
     },
     changeType() {
       return this.$store.state.graph.changeType;
+    },
+    labelCount() {
+      return this.$store.state.graph.labelCount;
     }
   },
   watch: {
-
+    labelCount(newVal, oldVal) {
+      if (newVal > 20) {
+        this.chartWidth = 800;
+      } else {
+        this.chartWidth = 600;
+      }
+    }
   },
   methods: {
     setGraphType() {
@@ -75,7 +85,9 @@ export default {
   border-radius: 8px;
 }
 
-
+.chart {
+  height: 600px;
+}
 
 .title {
   font-family: "Quicksand", "Source Sans Pro", -apple-system, BlinkMacSystemFont,
