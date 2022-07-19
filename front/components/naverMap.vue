@@ -39,6 +39,9 @@ export default {
         },
         locationFixed() {
             return this.$store.state.location.locationFixed;
+        },
+        locationTableList() {
+            return this.$store.state.location.locationTableList;
         }
     },
     watch: {
@@ -66,7 +69,7 @@ export default {
             if (b <= 0) {
                 result = `${a}억`;
             } else {
-                result = `${parseInt((a + b) * 100) / 100}억`
+                result = `${Math.round((a + b) * 100) / 100}억`
             }
             return result
         },
@@ -160,6 +163,15 @@ export default {
 
 
         },
+        dealDetail(dealIndex) {
+            const deal = this.dealList[dealIndex];
+            for (const location of this.locationTableList) {
+                if (location[1] && location[1] == deal.dong) {
+                    this.$store.dispatch('location/selectDealLocation', location.concat([deal.name]));
+                    return;
+                }
+            }
+        },
         removeMarker() {
             this.markers.forEach((marker) => {
                 marker.setMap(null);
@@ -226,6 +238,8 @@ export default {
 
         initMap(zoom_label, this.getMapState);
         this.map = map;
+
+        window.dealDetail = this.dealDetail;
 
         function initMap(zoom_label, getMapState) {
             map = new naver.maps.Map(document.getElementById('naverMap'), {
@@ -297,12 +311,10 @@ export default {
 
 .marker:hover {
     position: absolute;
-    background-color: #ffffffcc;
+    background-color: #f06ec9ad;
     border: 2px solid rgb(0, 0, 0);
     padding: 0.5rem;
     line-height: 1rem;
     border-radius: 0.5rem;
-    width: 60px;
-    height: 35px;
 }
 </style>
