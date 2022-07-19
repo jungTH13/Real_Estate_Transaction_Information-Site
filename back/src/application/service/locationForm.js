@@ -169,4 +169,13 @@ module.exports = class {
             return RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.DB_FIND_ERROR);
         }
     }
+
+    async findDealInfo(dong, name, location) {
+        const sgg_cd = location.sgg_cd;
+        try {
+            return this.repository.findDealInfo(dong, name, sgg_cd)
+        } catch (error) {
+            return RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.DB_FIND_ERROR);
+        }
+    }
 }
