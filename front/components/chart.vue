@@ -211,6 +211,8 @@ export default {
         });
       }
 
+      this.$store.dispatch('graph/setLabelCount', this.data.datasets.length)
+
       this.data.labels = labels;
       this.chart.update();
 

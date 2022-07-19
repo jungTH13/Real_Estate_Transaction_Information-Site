@@ -2,6 +2,7 @@ export const state = () => ({
     tradingVolumList: {},
     amountAVGList: {},
     changeType: 0,
+    labelCount: 0,
 })
 
 export const mutations = {
@@ -14,6 +15,9 @@ export const mutations = {
     setChangeType(state, payload) {
         state.changeType = (state.changeType + 1) % 2;
         console.log(state.changeType);
+    },
+    setLabelCount(state, payload) {
+        state.labelCount = payload;
     }
 }
 
@@ -64,5 +68,8 @@ export const actions = {
     },
     async setChangeType({ commit }, payload) {
         commit('setChangeType')
+    },
+    async setLabelCount({ commit }, payload) {
+        commit('setLabelCount', payload);
     }
 }
