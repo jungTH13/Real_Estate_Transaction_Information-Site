@@ -60,7 +60,7 @@ export const mutations = {
 
 export const actions = {
   async setDeals({ commit }, payload) {
-    await this.$axios.post('http://127.0.0.1:7000/proviousDeal', {
+    await this.$axios.post('/proviousDeal', {
       mapState: payload
     })
       .then(async (res) => {
@@ -73,7 +73,7 @@ export const actions = {
       })
   },
   async setDealsByLocation({ commit }, payload) {
-    await this.$axios.post('http://127.0.0.1:7000/locationFixed/proviousDeal', {
+    await this.$axios.post('/locationFixed/proviousDeal', {
       location: payload
     })
       .then(async (res) => {
