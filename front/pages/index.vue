@@ -19,7 +19,7 @@
         <nav class="navBar">
             <v-toolbar dark color="green">
                 <v-toolbar-title>
-                    <nuxt-link to="/">지역 검색</nuxt-link>
+                    <nuxt-link to="/">RETIS</nuxt-link>
                 </v-toolbar-title>
                 <v-toolbar-items style="margin-left:20px">
                     <v-form @submit.prevent="searchPlace">
