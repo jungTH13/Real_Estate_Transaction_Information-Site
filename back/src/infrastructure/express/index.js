@@ -8,6 +8,8 @@ const cors = require('cors');
 const dotenv = require('dotenv')
 const { logger } = require('../../config/winston');
 const RESPONSE = require('../../config/responseState');
+const hpp = require('hpp');
+const helmet = require('helmet');
 
 const dealRouter = require('./routes');
 const locationFixedRouter = require('./routes/locationFixed');
@@ -16,15 +18,27 @@ app = express();
 dotenv.config();
 
 module.exports = async (port = 7000, options) => {
+    const prod = process.env.NODE_ENV === 'production';
     passportConfig();
 
+    if (prod) {
+        app.use(helmet());
+        app.use(hpp());
+        app.use(morgan('combined'));
+        app.use(cors({
+            origin: 'http://localhost:3000',
+            credentials: true
+        }));
+    } else {
+        app.use(morgan('dev'));
+        app.use(cors({
+            origin: 'http://localhost:3000',
+            credentials: true
+        }));
+    }
     app.set('port', port);
     app.locals.options = options;
-    app.use(morgan('dev'));
-    app.use(cors({
-        origin: 'http://127.0.0.1:3000',
-        credentials: true
-    }))
+
     app.get('/favicon.ico', (req, res) => {
         res.status(404);
     });

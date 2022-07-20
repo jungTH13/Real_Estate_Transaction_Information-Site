@@ -31,8 +31,9 @@ const app = async () => {
 
     if (process.env.UPDATE === 'true') {
         dealsUpdateController.update(updateOptions)
-            .catch(() => {
-                logger.error('database update가 비정상적으로 종료되었습니다.');
+            .catch((error) => {
+                logger.error(error);
+                logger.warn('database update가 비정상적으로 종료되었습니다.');
             })
     }
 }
