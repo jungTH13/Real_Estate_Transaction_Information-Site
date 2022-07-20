@@ -40,6 +40,7 @@ export default {
       drawer: true,
       search: true,
       mini: true,
+      windowWidth: 0,
     }
   },
   components: {
@@ -64,16 +65,38 @@ export default {
   },
   watch: {
     labelCount(newVal, oldVal) {
-      if (newVal > 20) {
-        this.chartWidth = 800;
-      } else {
-        this.chartWidth = 600;
-      }
+      this.graphResize();
+    },
+    windowWidth(newVal, oldVal) {
+      this.graphResize();
     }
+  },
+  mounted() {
+    window.addEventListener("resize", () => {
+      if (this.windowWidth != window.innerWidth) {
+        this.windowWidth = window.innerWidth
+      }
+    });
   },
   methods: {
     setGraphType() {
       this.$store.dispatch('graph/setChangeType');
+    },
+    graphResize() {
+      const count = this.labelCount;
+      const size = this.windowWidth;
+      let result = this.chartWidth;
+
+      if (count > 20) {
+        result = 800;
+      } else {
+        result = 600;
+      }
+      if (size < result + 20) {
+        result = size - 20;
+      }
+
+      this.chartWidth = result;
     }
   }
 }
