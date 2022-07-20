@@ -32,7 +32,7 @@ module.exports = async (port = 7000, options) => {
     } else {
         app.use(morgan('dev'));
         app.use(cors({
-            origin: 'http://localhost:3000',
+            origin: 'http://127.0.0.1:3000',
             credentials: true
         }));
     }
@@ -83,7 +83,7 @@ module.exports = async (port = 7000, options) => {
     });
 
     app.listen(app.get('port'), () => {
-        logger.info(`서버 작동중 - PORT:${app.get('port')}`);
+        console.log(`서버 작동중 - PORT:${app.get('port')}`);
     });
 
     return app;
