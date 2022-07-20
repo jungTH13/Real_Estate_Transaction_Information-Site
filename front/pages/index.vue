@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import NaverMap from '~/components/NaverMap.vue'
+import NaverMap from '~/components/naverMap.vue'
 import SearchResult from '../components/searchResult.vue';
 import GroupSet from '../components/groupSet.vue';
 import Graph from '~/components/graph.vue';
