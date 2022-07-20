@@ -255,7 +255,7 @@ module.exports = class extends LocationFormrepository {
 
     async findMatchedDong(coordinate, sgg_cd) {
         return await this.models[sgg_cd].findAll({
-            attribute: ['dong'],
+            attributes: ['dong'],
             where: {
                 x: { [Op.and]: [{ [Op.gt]: coordinate.min_x }, { [Op.lt]: coordinate.max_x }] },
                 y: { [Op.and]: [{ [Op.gt]: coordinate.min_y }, { [Op.lt]: coordinate.max_y }] }
