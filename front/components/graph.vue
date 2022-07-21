@@ -12,6 +12,7 @@
         <v-list-item-title v-if="changeType === 1" style="text-align: center;">
           평당 거래가 (만원)
         </v-list-item-title>
+        <v-btn color="white" style="margin-right:5px;" @click="setLegend">범례</v-btn>
         <v-btn icon hide-details @click.stop="setGraphType">
           <v-icon hide-details>mdi-swap-horizontal</v-icon>
         </v-btn>
@@ -20,7 +21,7 @@
       <v-divider></v-divider>
 
       <div v-if="!search">
-        <Chart></Chart>
+        <Chart :legend="legend"></Chart>
       </div>
 
     </v-navigation-drawer>
@@ -40,6 +41,8 @@ export default {
       drawer: true,
       search: true,
       mini: true,
+      windowWidth: 0,
+      legend: true,
     }
   },
   components: {
@@ -64,16 +67,41 @@ export default {
   },
   watch: {
     labelCount(newVal, oldVal) {
-      if (newVal > 20) {
-        this.chartWidth = 800;
-      } else {
-        this.chartWidth = 600;
-      }
+      this.graphResize();
+    },
+    windowWidth(newVal, oldVal) {
+      this.graphResize();
     }
+  },
+  mounted() {
+    window.addEventListener("resize", () => {
+      if (this.windowWidth != window.innerWidth) {
+        this.windowWidth = window.innerWidth
+      }
+    });
   },
   methods: {
     setGraphType() {
       this.$store.dispatch('graph/setChangeType');
+    },
+    graphResize() {
+      const count = this.labelCount;
+      const size = this.windowWidth;
+      let result = this.chartWidth;
+
+      if (count > 20) {
+        result = 800;
+      } else {
+        result = 600;
+      }
+      if (size < result + 20) {
+        result = size - 20;
+      }
+
+      this.chartWidth = result;
+    },
+    setLegend() {
+      this.legend = !this.legend;
     }
   }
 }

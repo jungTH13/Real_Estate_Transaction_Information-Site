@@ -1,7 +1,7 @@
 <template>
     <v-row>
         <v-dialog v-model="dialog" max-width="600" hide-overlay transition="dialog-bottom-transition">
-            <v-card>
+            <v-card style="position:relative; z-index:100;">
                 <v-toolbar dark color="primary">
                     <v-btn icon dark @click="dialog = false">
                         <v-icon>mdi-close</v-icon>
@@ -10,8 +10,9 @@
                     <v-spacer />
                     <v-toolbar-title>{{ type }}</v-toolbar-title>
                     <v-toolbar-title>{{ location }}</v-toolbar-title>
+                    <v-btn color="primary" style="margin-left:5px; width:20px;" @click="setLegend">범례</v-btn>
                 </v-toolbar>
-                <v-card style="height:70vh;">
+                <v-card style="height:70vh; overflow-y: auto;">
                     <div style="height:8px;"></div>
                     <v-card style="margin-inline: 10px;">
                         <canvas id="dealChart"></canvas>
@@ -29,7 +30,7 @@
 </template>
 
 <script>
-import Chart from 'chart.js';
+//import Chart from 'chart.js';
 
 
 export default {
@@ -62,19 +63,39 @@ export default {
                 data: this.data,
                 options: {
                     responsive: true,
+                    plugins: {
+                        legend: {
+                            display: true
+                        },
+                    },
                     scales: {
                         x: {
-                            display: true,
-                            title: {
-                                display: true
+                            ticks: {
+                                callback: function (value, index, values) {
+                                    const date = new Date();
+                                    let year = date.getFullYear();
+                                    let month = date.getMonth() + 1 + value;
+                                    while (month < 1) {
+                                        year--;
+                                        month += 12;
+                                    }
+                                    return `${(year % 100)}.${month}`
+                                }
                             }
                         },
                         y: {
-                            display: true,
-                            title: {
-                                display: true,
-                                text: 'Value'
-                            },
+                            ticks: {
+                                callback: function (value, index, values) {
+                                    if (value > 0) {
+                                        if (value.toString().length > 3) {
+                                            return parseInt(value * 100) / 100 + '억';
+                                        }
+                                        return value + '억';
+                                    } else {
+                                        return '0'
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -83,7 +104,6 @@ export default {
         }
     },
     mounted() {
-
     },
     computed: {
         selectDealLocation() {
@@ -95,8 +115,6 @@ export default {
     },
     watch: {
         dialog(newVal, oldVal) {
-            console.log('dialog:', newVal)
-            console.log(this.selectDealLocation);
         },
         selectDealLocation(newVal, oldVal) {
             this.title = `${newVal[2]} `;
@@ -122,7 +140,6 @@ export default {
             return result
         },
         creatChart() {
-            console.log('update!')
             if (this.chart) {
                 this.chart.update();
             } else {
@@ -165,6 +182,10 @@ export default {
             }
 
             this.creatChart();
+        },
+        setLegend() {
+            this.config.options.plugins.legend.display = !this.config.options.plugins.legend.display;
+            this.chart.update();
         }
     }
 

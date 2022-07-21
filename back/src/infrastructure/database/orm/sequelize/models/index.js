@@ -6,6 +6,7 @@ const config = require('../../../../../config/config.json')[env];
 const { insertLocationFormTableInfo, createLocationFormTable } = require('../setup')
 const apiInfo = require('../../../../../config/apiInfo');
 const { logger } = require('../../../../../config/winston');
+const RESPONSE = require('../../../../../config/responseState');
 
 console.log(env);
 config.logging = (msg) => logger.verbose(msg);
@@ -36,9 +37,12 @@ db.init = async () => {
             logger.info('데이터베이스 초기화 완료');
         })
         .catch((error) => {
-            logger.error('데이터베이스 초기화중 오류발생');
-            logger.error(`${error}`);
-            process.exit(1);
+            try {
+                RESPONSE.errorCheckAndloggingThenThrow(error)
+            } catch (error) {
+                console.log('데이터베이스 초기화중 문제발생으로 시스템을 종료합니다.')
+                process.exit(1);
+            }
         })
 };
 

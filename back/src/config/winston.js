@@ -62,7 +62,7 @@ const logger = Winston.createLogger({
 });
 
 // Production 환경이 아닌 경우(dev 등)
-if ((process.env.NODE_ENV || 'development') === 'development') {
+if ((process.env.NODE_ENV || 'development') !== 'test') {
     logger.add(new Winston.transports.Console({
         format: Winston.format.combine(
             Winston.format.colorize(), // 색깔 넣어서 출력

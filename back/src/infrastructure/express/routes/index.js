@@ -36,7 +36,6 @@ router.post('/searchLcationAndDong', async (req, res, next) => {
 })
 
 router.post('/selectDealInfo', async (req, res, next) => {
-    console.log(req.body)
     await locationDealsController.selectDealInfo(Object.assign(app.locals.options, { body: req.body }))
         .then((result) => res.json({ status: 200, data: result }))
         .catch((error) => next(error));

@@ -1,5 +1,8 @@
 <template>
     <v-app>
+        <div style="position:absolute; top:0px; left:0px;">
+            <selectDealinfo></selectDealinfo>
+        </div>
         <div class="locationSelect">
             <locationSelect @searchText="setPlace"></locationSelect>
         </div>
@@ -19,7 +22,7 @@
         <nav class="navBar">
             <v-toolbar dark color="green">
                 <v-toolbar-title>
-                    <nuxt-link to="/">지역 검색</nuxt-link>
+                    <nuxt-link to="/">RETIS</nuxt-link>
                 </v-toolbar-title>
                 <v-toolbar-items style="margin-left:20px">
                     <v-form @submit.prevent="searchPlace">
@@ -40,14 +43,15 @@
                 </v-toolbar-items>
             </v-toolbar>
         </nav>
-        <NaverMap :search="searchspot"></NaverMap>
-        <selectDealinfo style="position:absolute; top:0px; left:0px;"></selectDealinfo>
+        <NaverMap :search="searchspot">
+
+        </NaverMap>
     </v-app>
 
 </template>
 
 <script>
-import NaverMap from '~/components/NaverMap.vue'
+import NaverMap from '~/components/naverMap.vue'
 import SearchResult from '../components/searchResult.vue';
 import GroupSet from '../components/groupSet.vue';
 import Graph from '~/components/graph.vue';
@@ -76,10 +80,10 @@ export default {
     },
     watch: {
         dealList(newVal, oldVal) {
-            console.log(newVal)
+            console.log('dealList: ', newVal.length)
         },
         dealProviousList(newVal, oldVal) {
-            console.log(newVal)
+            console.log('dealProviousList:', newVal.length)
         }
     },
     components: {
@@ -122,13 +126,10 @@ a {
     position: absolute;
     top: 65px;
     left: 10px;
-    z-index: 10000;
+    z-index: 10;
     background-color: #ffffff00;
-    overflow: scroll;
-    overflow-y: auto;
     max-width: 100%;
     height: 48px;
-    overflow-x: auto;
 }
 
 .navBar {
@@ -145,7 +146,7 @@ a {
     position: absolute;
     top: 110px;
     left: 10px;
-    z-index: 10000;
+    z-index: 10;
     background-color: #ffffff00;
     overflow-y: auto;
 }
@@ -154,7 +155,7 @@ a {
     position: absolute;
     bottom: 50px;
     right: 10px;
-    z-index: 10000;
+    z-index: 20;
     background-color: #ffffff00;
     overflow-y: auto;
 }

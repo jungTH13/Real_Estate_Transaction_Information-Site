@@ -23,7 +23,7 @@ export const mutations = {
 
 export const actions = {
     async setTradingVolum({ commit }, payload) {
-        await this.$axios.post('http://127.0.0.1:7000/traingVolum', {
+        await this.$axios.post('/traingVolum', {
             mapState: payload
         })
             .then(async (res) => {
@@ -34,7 +34,7 @@ export const actions = {
             })
     },
     async setAmountAVGList({ commit }, payload) {
-        await this.$axios.post('http://127.0.0.1:7000/amountAVG', {
+        await this.$axios.post('/amountAVG', {
             mapState: payload
         })
             .then(async (res) => {
@@ -45,7 +45,7 @@ export const actions = {
             })
     },
     async setTradingVolumByLocation({ commit }, payload) {
-        await this.$axios.post('http://127.0.0.1:7000/locationFixed/traingVolum', {
+        await this.$axios.post('/locationFixed/traingVolum', {
             location: payload
         })
             .then(async (res) => {
@@ -56,7 +56,7 @@ export const actions = {
             })
     },
     async setAmountAVGListByLocation({ commit }, payload) {
-        await this.$axios.post('http://127.0.0.1:7000/locationFixed/amountAVG', {
+        await this.$axios.post('/locationFixed/amountAVG', {
             location: payload
         })
             .then(async (res) => {

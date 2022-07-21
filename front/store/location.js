@@ -13,19 +13,17 @@ export const mutations = {
         state.locationFixed = payload;
     },
     selectDealLocation(state, payload) {
-        console.log(payload)
         state.selectDealLocation = payload;
     },
     selectLocationDeals(state, payload) {
         state.selectLocationDeals = payload;
-        console.log(state.selectLocationDeals)
     }
 
 }
 
 export const actions = {
     async setLocationTableList({ commit }, payload) {
-        await this.$axios.post('http://127.0.0.1:7000/locationFixed/searchLocationAndDong', {
+        await this.$axios.post('/locationFixed/searchLocationAndDong', {
             mapState: payload
         })
             .then(async (res) => {
@@ -43,7 +41,7 @@ export const actions = {
         commit('selectDealLocation', payload);
     },
     async selectLocationDeals({ commit }, selectDealLocation) {
-        await this.$axios.post('http://127.0.0.1:7000/selectDealInfo', {
+        await this.$axios.post('/selectDealInfo', {
             location: selectDealLocation
         })
             .then(async (res) => {
