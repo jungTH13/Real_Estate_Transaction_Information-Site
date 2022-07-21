@@ -1,3 +1,6 @@
 /front/node_modules/
 /back/.env
-/back/node_modules
+/back/node_modules/
+/front/.nuxt/
+/back/logs
+/Real_Estate_Transaction_Information-Site.pem
