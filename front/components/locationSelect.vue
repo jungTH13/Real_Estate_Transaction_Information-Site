@@ -1,7 +1,6 @@
 <template>
-    <v-chip-group v-model="locationSelection" active-class="deep-purple accent-3 white--text">
-        <v-chip v-for="[index, location] of locationTableList.entries()" :key=index>
-
+    <v-chip-group v-model="locationSelection" active-class="deep-purple accent-2 white--text">
+        <v-chip v-for="[index, location] of locationTableList.entries()" :key=index color="light-blue lighten-5">
             <strong v-if="location.length == 1">
                 {{ location[location.length - 1] }}
             </strong>

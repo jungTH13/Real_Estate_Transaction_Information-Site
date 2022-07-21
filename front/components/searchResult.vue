@@ -98,7 +98,6 @@ export default {
   },
   watch: {
     refreshList(newVal, oldVal) {
-      console.log("refreshList active")
       this.searchDealList.splice(0)
       if (!this.search) {
         let target = document.getElementById('dealListBox');

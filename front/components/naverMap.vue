@@ -158,7 +158,7 @@ export default {
                 .then(() => {
                     this.$store.dispatch('dealList/setVisibleDealsIndex', visibleList);
                     this.$store.dispatch('dealList/refreshList');
-                    console.log(this.markers.length)
+                    console.log('visibleList:', this.markers.length)
                 });
 
 

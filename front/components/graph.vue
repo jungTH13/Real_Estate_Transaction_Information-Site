@@ -12,6 +12,7 @@
         <v-list-item-title v-if="changeType === 1" style="text-align: center;">
           평당 거래가 (만원)
         </v-list-item-title>
+        <v-btn color="white" style="margin-right:5px;" @click="setLegend">범례</v-btn>
         <v-btn icon hide-details @click.stop="setGraphType">
           <v-icon hide-details>mdi-swap-horizontal</v-icon>
         </v-btn>
@@ -20,7 +21,7 @@
       <v-divider></v-divider>
 
       <div v-if="!search">
-        <Chart></Chart>
+        <Chart :legend="legend"></Chart>
       </div>
 
     </v-navigation-drawer>
@@ -41,6 +42,7 @@ export default {
       search: true,
       mini: true,
       windowWidth: 0,
+      legend: true,
     }
   },
   components: {
@@ -97,6 +99,9 @@ export default {
       }
 
       this.chartWidth = result;
+    },
+    setLegend() {
+      this.legend = !this.legend;
     }
   }
 }

@@ -13,12 +13,10 @@ export const mutations = {
         state.locationFixed = payload;
     },
     selectDealLocation(state, payload) {
-        console.log(payload)
         state.selectDealLocation = payload;
     },
     selectLocationDeals(state, payload) {
         state.selectLocationDeals = payload;
-        console.log(state.selectLocationDeals)
     }
 
 }

@@ -9,6 +9,12 @@
 //import Chart from 'chart.js';
 
 export default {
+  props: {
+    legend: {
+      type: Boolean,
+      default: true
+    },
+  },
   data() {
     return {
       loading: false,
@@ -25,7 +31,13 @@ export default {
       config: {
         type: 'line',
         data: this.data,
-        options: {}
+        options: {
+          plugins: {
+            legend: {
+              display: true
+            },
+          }
+        }
       },
       chart: null,
     }
@@ -68,6 +80,10 @@ export default {
     }
   },
   watch: {
+    legend(newVal, oldVal) {
+      this.config.options.plugins.legend.display = newVal;
+      this.chart.update();
+    },
     dealList(newVal, oldVal) {
       this.loading = true;
       this.switchSetGraphData(this.changeType);
