@@ -1,6 +1,7 @@
 # 부동산 실거래 정보 제공 사이트
 <strong>
-http://ec2-52-21-184-141.compute-1.amazonaws.com/
+URL: http://ec2-52-21-184-141.compute-1.amazonaws.com/
+<br/>
 서울시에서 거래되는 부동산(아파트,오피스텔,연립다세대)에 대한 실제로 거래된 정보를 지도상에 시각화 하여 제공하는 서비스 입니다.
 </strong>
 <br/>
