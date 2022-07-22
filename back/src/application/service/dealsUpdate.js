@@ -124,16 +124,20 @@ module.exports = class dealUpdate {
     // api 통신을 통해서 거래 정보를 가져온다
     async getProperty(url, params) {
         for (let i = 0; i < 10; i++) {
-            const res = await this.dealsApi(url, params);
-            if (res.status) {
-                return res;
-            }
-            if (res.code === RESPONSE.API_ACCESS_DENIAL.code) {
-                return res;
-            }
-            logger.warn(`Property데이터 수신 에러 재시도(${i + 1}/10)`);
-            if (i === 9) {
-                throw new Error('getProperty의 정상적인 데이터 수신에 실패했습니다.');
+            try {
+                const res = await this.dealsApi(url, params);
+                if (res.status) {
+                    return res;
+                }
+                if (res.code === RESPONSE.API_ACCESS_DENIAL.code) {
+                    return res;
+                }
+            } catch (error) {
+                logger.warn(`Property데이터 수신 에러 재시도(${i + 1}/10)`);
+                if (i === 9) {
+                    RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.API_ERROR);
+                    // throw new Error('getProperty의 정상적인 데이터 수신에 실패했습니다.');
+                }
             }
         }
     }
@@ -141,13 +145,17 @@ module.exports = class dealUpdate {
     // api 통신틍 통해 각 거래정보의 위치정보를 가져온다.
     async findCoordinate(address) {
         for (let i = 0; i < 10; i++) {
-            const res = await this.mapApi(address)
-            if (res.status) {
-                return res;
-            }
-            logger.warn(`map데이터 수신 에러 재시도(${i + 1}/10)`);
-            if (i === 9) {
-                throw new Error('findCoordinate의 정상적인 데이터 수신에 실패했습니다.');
+            try {
+                const res = await this.mapApi(address)
+                if (res.status) {
+                    return res;
+                }
+            } catch (error) {
+                logger.warn(`map데이터 수신 에러 재시도(${i + 1}/10)`);
+                if (i === 9) {
+                    RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.API_ERROR);
+                    // throw new Error('findCoordinate의 정상적인 데이터 수신에 실패했습니다.');
+                }
             }
         }
     }

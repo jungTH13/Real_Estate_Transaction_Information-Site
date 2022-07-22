@@ -19,10 +19,10 @@ const naver = async (address) => {
 
     try {
         const result = await axios(url, { headers, params })
-            .then((res) => res)
-            .catch(() => RESPONSE.API_TIMEOUT);
+        // .then((res) => res)
+        // .catch(() => RESPONSE.API_TIMEOUT);
         if (result.status !== 200) {
-            return RESPONSE.API_RESPONSE_ERROR;
+            throw new Error(`올바른 데이터가 수신되지 않았습니다.[status:${result.status}]`);
         }
         if (result.data.meta.totalCount > 0) {
             const response = RESPONSE.SUCCESS;
@@ -41,7 +41,7 @@ const naver = async (address) => {
         }
         return response;
     } catch (error) {
-        RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.API_ERROR);
+        RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.API_RESPONSE_ERROR);
     }
 }
 

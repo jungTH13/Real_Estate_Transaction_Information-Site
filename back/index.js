@@ -27,14 +27,9 @@ const app = async () => {
         mapApi.naver
     );
 
-    await expressServer(process.env.PORT || 7000, updateOptions);
-
     const databaseUpdate = () => {
         if (process.env.UPDATE === 'true') {
             dealsUpdateController.update(updateOptions)
-                .then(() => {
-                    setTimeout(databaseUpdate, 24 * 60 * 60 * 1000)
-                })
                 .catch((error) => {
                     logger.error(error);
                     logger.warn('database update가 비정상적으로 종료되었습니다.');
@@ -42,6 +37,9 @@ const app = async () => {
         }
     }
 
+    await expressServer(process.env.PORT || 7000, updateOptions);
+
+    setInterval(databaseUpdate, 24 * 60 * 60 * 1000)
     databaseUpdate();
 }
 

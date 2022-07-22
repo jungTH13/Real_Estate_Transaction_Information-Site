@@ -33,6 +33,7 @@
                     </v-form>
                 </v-toolbar-items>
                 <v-spacer />
+                <!--
                 <v-toolbar-items>
                     <v-btn text nuxt to="">
                         <div>프로필</div>
@@ -41,6 +42,7 @@
                         <div>회원가입</div>
                     </v-btn>
                 </v-toolbar-items>
+                -->
             </v-toolbar>
         </nav>
         <NaverMap :search="searchspot">

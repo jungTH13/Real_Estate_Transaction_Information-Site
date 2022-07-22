@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest --silent",
     "dev": "nodemon index",
-    "start": "cross-env PORT=80 NODE_ENV=production pm2 start index.js"
+    "start": "cross-env PORT=7000 NODE_ENV=production pm2 start index.js"
   },
   "author": "TH13",
   "license": "MIT",
