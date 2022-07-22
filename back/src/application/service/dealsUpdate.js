@@ -136,7 +136,7 @@ module.exports = class dealUpdate {
                 logger.warn(`Property데이터 수신 에러 재시도(${i + 1}/10)`);
                 if (i === 9) {
                     RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.API_ERROR);
-                    //throw new Error('getProperty의 정상적인 데이터 수신에 실패했습니다.');
+                    // throw new Error('getProperty의 정상적인 데이터 수신에 실패했습니다.');
                 }
             }
         }
@@ -154,7 +154,7 @@ module.exports = class dealUpdate {
                 logger.warn(`map데이터 수신 에러 재시도(${i + 1}/10)`);
                 if (i === 9) {
                     RESPONSE.errorCheckAndloggingThenThrow(error, RESPONSE.API_ERROR);
-                    //throw new Error('findCoordinate의 정상적인 데이터 수신에 실패했습니다.');
+                    // throw new Error('findCoordinate의 정상적인 데이터 수신에 실패했습니다.');
                 }
             }
         }
