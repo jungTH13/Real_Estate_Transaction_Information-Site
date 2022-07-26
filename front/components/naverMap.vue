@@ -5,6 +5,13 @@
                 style="position:absolute; font-weight:900; font-family=red; left:80px; top:115px; z-index: 100; background-color: #ffffff44; border: 1px solid rgb(255, 0, 0);">
                 지도가 너무 축소되어 있습니다. 확대해주세요!
             </v-card>
+            <v-card style="text-align: center; position:absolute; right:20px; top: 110px; z-index:100;">
+                <v-btn icon hide-details @click.stop="markerStyleChange" style=" width:40px;height:40px;">
+                    <v-icon hide-details>mdi-map-marker-outline</v-icon>
+                    <v-icon hide-details style="position:absolute; right:0px;bottom:-8px;">
+                        mdi-swap-horizontal</v-icon>
+                </v-btn>
+            </v-card>
         </div>
     </div>
 </template>
@@ -22,7 +29,8 @@ export default {
             markers: [],
             pause: false,
             removeState: false,
-            visibleMarkersCount: 0
+            visibleMarkersCount: 0,
+            markerType: 0,
         }
     },
     computed: {
@@ -72,6 +80,10 @@ export default {
         }
     },
     methods: {
+        markerStyleChange() {
+            this.markerType = (this.markerType + 1) % 2;
+            this.setMarker(this.dealList, this.options);
+        },
         controller(type) {
             if (type === "center_changed") {
                 this.removeMarker(300);
@@ -177,7 +189,7 @@ export default {
                 if (this.locationFixed && (mapBounds.min.x > deal.x || mapBounds.min.y > deal.y || mapBounds.max.x < deal.x || mapBounds.max.y < deal.y)) {
                     return;
                 }
-                this.setTextMarkers(deal, contextstyle, percentText, index, markersDivList, mapBounds, offset)
+                this.setTextMarkers(deal, contextstyle, percentText, index, markersDivList, mapBounds, offset, this.markerType)
             })
 
             Promise.all(promises)
@@ -191,10 +203,12 @@ export default {
 
 
         },
-        setTextMarkers(deal, contextstyle, percentText, index, markersDivList, mapBounds, offset) {
+        setTextMarkers(deal, contextstyle, percentText, index, markersDivList, mapBounds, offset, Type) {
             let positionX = parseInt(this.map.size.width * ((deal.x - mapBounds.min.x) / (mapBounds.max.x - mapBounds.min.x))) - offset.x;
             let positionY = parseInt(this.map.size.height * ((mapBounds.max.y - deal.y) / (mapBounds.max.y - mapBounds.min.y))) - offset.y;
-            const contentText = `
+            let contentText;
+            if (Type === 0) {
+                contentText = `
                 <div title="" style="position: absolute; overflow: visible; box-sizing: content-box !important; cursor: inherit; left: ${positionX}px; top: ${positionY}px;">
                     <div style="cursor: pointer;">
                         <div class="marker" style="${contextstyle}" onclick='dealDetail(${index})'>
@@ -208,6 +222,17 @@ export default {
                         </div>
                     </div>
                 </div>`;
+            }
+            else if (Type === 1 && percentText != '') {
+                contentText = `
+                <div title="" style="position: absolute; overflow: visible; box-sizing: content-box !important; cursor: inherit; left: ${positionX}px; top: ${positionY}px;">
+                    <div style="cursor: pointer;">
+                        <div class="markerSimple" style="${contextstyle}" onclick='dealDetail(${index})'>
+                            ${percentText}
+                        </div>
+                    </div>
+                </div>`
+            }
             markersDivList.push(contentText);
         },
         setMarkers(deal, contextstyle, percentText, index) {
@@ -233,9 +258,15 @@ export default {
             }));
         },
         dealDetail(dealIndex) {
-            console.log(dealIndex);
             const deal = this.dealList[dealIndex];
-            const location = this.locationTableList[this.locationSelectionIndex];
+            let location;
+
+            if (this.locationSelectionIndex === undefined) {
+                location = this.locationTableList.find((data) => data[1] && data[1] == deal.dong);
+            } else {
+                location = this.locationTableList[this.locationSelectionIndex];
+            }
+
             this.$store.dispatch('location/selectDealLocation', location.concat(location.length === 1 ? [deal.dong, deal.name] : [deal.name]));
 
             // for (const location of this.locationTableList) {
@@ -360,6 +391,19 @@ export default {
     border-radius: 0.5rem;
     width: 45px;
     height: 20px;
+}
+
+.markerSimple {
+    overflow: hidden;
+    padding: 0px 0px 0px 0px;
+    position: absolute;
+    background-color: #ffffff88;
+    border: 2px solid rgba(0, 0, 0, 0.253);
+    padding: 0.5rem;
+    line-height: 1rem;
+    border-radius: 0.5rem;
+    width: 17px;
+    height: 4px;
 }
 
 .markerup {
