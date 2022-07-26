@@ -47,6 +47,7 @@ export default {
                 this.$store.dispatch('location/setLocationFixed', false);
             }
             console.log(newVal)
+            this.$store.dispatch('location/setLocationSelectionIndex', newVal);
         },
         dealList(newVal, oldVal) {
             if (!this.locationFixed) {

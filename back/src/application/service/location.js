@@ -6,7 +6,10 @@ module.exports = class {
         this.repository = repository;
     }
 
-    async findIncluedArea(coordinate) {
+    async findIncluedArea(coordinate, Zoom = 22) {
+        if (Zoom < 14) {
+            return [];
+        }
         try {
             validator.coordinate(coordinate);
             const locationList = await this.repository.findAll();

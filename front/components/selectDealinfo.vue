@@ -79,7 +79,7 @@ export default {
                                         year--;
                                         month += 12;
                                     }
-                                    return `${(year % 100)}.${month}`
+                                    return `${(year % 100)}.${Math.round(month)}`
                                 }
                             }
                         },
