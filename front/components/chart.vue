@@ -185,7 +185,7 @@ export default {
                   const area = (houseType['오피스텔'] ? volumList[i]['오피스텔area'] : 0) + (houseType['아파트'] ? volumList[i]['아파트area'] : 0) + (houseType['연립다세대'] ? volumList[i]['연립다세대area'] : 0);
                   totalAmountList[index] += amount;
                   totalAreaList[index] += area;
-                  dataList.push(amount / area || dataList[dataList.length - 1] || 0);
+                  dataList.push(amount / area * 3.3 || dataList[dataList.length - 1] || 0);
                 }
                 i++;
               } else {
@@ -214,7 +214,7 @@ export default {
       //changType에 따른 시각화 데이터 처리 분기
       if (this.changeType === 1) {
         for (const [index, data] of totalList.entries()) {
-          totalList[index] = totalAmountList[index] / totalAreaList[index] || totalList[index - 1] || 0;
+          totalList[index] = (totalAmountList[index] / totalAreaList[index]) * 3.3 || totalList[index - 1] || 0;
         }
       }
       if (this.data.datasets.length > 1) {

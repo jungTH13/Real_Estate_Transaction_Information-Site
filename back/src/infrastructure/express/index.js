@@ -26,7 +26,7 @@ module.exports = async (port = 7000, options) => {
         app.use(hpp());
         app.use(morgan('combined'));
         app.use(cors({
-            origin: 'http://ec2-52-21-184-141.compute-1.amazonaws.com',
+            origin: 'http://ec2-3-36-175-42.ap-northeast-2.compute.amazonaws.com',
             credentials: true
         }));
     } else {

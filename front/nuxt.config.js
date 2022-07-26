@@ -15,8 +15,8 @@ module.exports = {
 
   },
   axios: {
-    browserBaseURL: process.env.NODE_ENV === 'production' ? 'http://18.214.173.244' : 'http://127.0.0.1:7000',
-    baseURL: process.env.NODE_ENV === 'production' ? 'http://18.214.173.244' : 'http://127.0.0.1:7000',
+    browserBaseURL: process.env.NODE_ENV === 'production' ? 'http://13.125.152.146' : 'http://127.0.0.1:7000',
+    baseURL: process.env.NODE_ENV === 'production' ? 'http://13.125.152.146' : 'http://127.0.0.1:7000',
     https: false,
   },
   server: {

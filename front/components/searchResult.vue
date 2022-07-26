@@ -133,6 +133,9 @@ export default {
     },
     async onScroll() {
       let target = document.getElementById('dealListBox');
+      if (!target) {
+        return;
+      }
 
       if (this.resultBoxType === 0 && target.scrollHeight - 300 < target.clientHeight + target.scrollTop) {
         if (this.visibleDealsIndex.length > this.searchDealList.length) {
