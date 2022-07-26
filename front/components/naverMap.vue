@@ -49,6 +49,9 @@ export default {
         },
         locationTableList() {
             return this.$store.state.location.locationTableList;
+        },
+        locationSelectionIndex() {
+            return this.$store.state.location.locationSelectionIndex;
         }
     },
     watch: {
@@ -230,13 +233,17 @@ export default {
             }));
         },
         dealDetail(dealIndex) {
+            console.log(dealIndex);
             const deal = this.dealList[dealIndex];
-            for (const location of this.locationTableList) {
-                if (location[1] && location[1] == deal.dong) {
-                    this.$store.dispatch('location/selectDealLocation', location.concat([deal.name]));
-                    return;
-                }
-            }
+            const location = this.locationTableList[this.locationSelectionIndex];
+            this.$store.dispatch('location/selectDealLocation', location.concat(location.length === 1 ? [deal.dong, deal.name] : [deal.name]));
+
+            // for (const location of this.locationTableList) {
+            //     if (location[1] && location[1] == deal.dong) {
+
+            //         return;
+            //     }
+            // }
         },
         removeMarker(visibleMarkersCountLimit = 0) {
             if (this.map.mapPane.view.panes.overlayImage.innerHTML != '' && visibleMarkersCountLimit < this.visibleMarkersCount) {

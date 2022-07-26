@@ -1,6 +1,7 @@
 export const state = () => ({
     locationTableList: [], //[[지역구명,지역동명],...]
     locationFixed: false, //고정 지역 선택시 기존 갱신 로직 pause
+    locationSelectionIndex: undefined,
     selectDealLocation: [], // [지역구명,지역동명,건물명]
     selectLocationDeals: [] //selectLocation의 거래정보
 })
@@ -17,6 +18,9 @@ export const mutations = {
     },
     selectLocationDeals(state, payload) {
         state.selectLocationDeals = payload;
+    },
+    locationSelectionIndex(state, payload) {
+        state.locationSelectionIndex = payload;
     }
 
 }
@@ -51,5 +55,8 @@ export const actions = {
                 console.error(error);
             })
 
+    },
+    setLocationSelectionIndex({ commit }, index) {
+        commit('locationSelectionIndex', index);
     }
 }
