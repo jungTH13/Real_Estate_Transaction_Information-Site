@@ -16,6 +16,8 @@ export default {
             map: null,
             markers: [],
             pause: false,
+            removeState: false,
+            visibleMarkersCount: 0
         }
     },
     computed: {
@@ -62,6 +64,22 @@ export default {
         }
     },
     methods: {
+        controller(type) {
+            if (type === "center_changed") {
+                this.removeMarker(500);
+                window.setTimeout(() => {
+                    this.getMapState();
+                }, 100);
+                return;
+            }
+            if (type === "zoom_changed") {
+                this.removeMarker();
+                window.setTimeout(() => {
+                    this.getMapState();
+                }, 100);
+                return;
+            }
+        },
         setAmount(amount) {
             let result = '';
             let a = parseInt(amount / 10000);
@@ -77,29 +95,33 @@ export default {
             let visibleList = [];
             let dealProviousIndex = 0;
             let dealProviousLength = this.dealProviousList.length;
-            if (this.locationFixed) {
-                this.removeMarker();
-            }
+            let markersDivList = [];
+            const mapBounds = { min: this.map.bounds._min, max: this.map.bounds._max };
+            this.removeMarker();
 
             const promises = dealList.map((deal, index) => {
+                //groupSet component에서 설정된 설정값에 따른 핸들링
                 if (options) {
                     if ((!options.type[deal.house_type]) ||
                         (options.date.min[0] > deal.deal_year || (options.date.min[0] == deal.deal_year && options.date.min[1] > deal.deal_month)) ||
                         (options.date.max[0] < deal.deal_year || (options.date.max[0] == deal.deal_year && options.date.max[1] < deal.deal_month)) ||
                         (options.amount[0] > deal.deal_amount || (options.amount[1] != options.AMOUNTMAX && options.amount[1] < deal.deal_amount))
                     ) {
-                        if (deal.provious && dealProviousIndex < dealProviousLength && this.dealProviousList[dealProviousIndex].name == deal.name && this.dealProviousList[dealProviousIndex].id == deal.provious && this.dealProviousList[dealProviousIndex].dong == deal.dong) {
+                        if (deal.provious && dealProviousIndex < dealProviousLength && this.dealProviousList[dealProviousIndex].name == deal.name && this.dealProviousList[dealProviousIndex].id == deal.provious && this.dealProviousList[dealProviousIndex].dong == deal.dong && this.dealProviousList[dealProviousIndex].house_type == deal.house_type) {
                             dealProviousIndex++;
                         }
                         deal.visible = false;
                         return;
                     }
                 }
+                //거래정보가 시각화되어지는 정보일 경우(=>searchResult에서 거래정보 시각화시 활용)
                 visibleList.push(index);
                 deal.visible = true;
+
+                //최근거래가와 직전 거래가의 변동율에 따른 시각화 효과 설정
                 let percentText = '';
                 let contextstyle = 'border: 1px solid rgb(0, 0, 0, 0.25);'
-                if (deal.provious && dealProviousIndex < dealProviousLength && this.dealProviousList[dealProviousIndex].name == deal.name && this.dealProviousList[dealProviousIndex].id == deal.provious && this.dealProviousList[dealProviousIndex].dong == deal.dong) {
+                if (deal.provious && dealProviousIndex < dealProviousLength && this.dealProviousList[dealProviousIndex].name == deal.name && this.dealProviousList[dealProviousIndex].id == deal.provious && this.dealProviousList[dealProviousIndex].dong == deal.dong && this.dealProviousList[dealProviousIndex].house_type == deal.house_type) {
                     let dealProvious = this.dealProviousList[dealProviousIndex]
 
                     if ((options.date.min[0] > dealProvious.deal_year || (options.date.min[0] == dealProvious.deal_year && options.date.min[1] > dealProvious.deal_month)) ||
@@ -108,9 +130,6 @@ export default {
                     }
                     else if (deal.deal_amount < dealProvious.deal_amount) {
                         let blue = 2 * (deal.deal_amount / dealProvious.deal_amount > 0.5 ? 1 - deal.deal_amount / dealProvious.deal_amount : 0.5);
-                        // blue = 105 + parseInt(150 * blue);
-                        // const green = 255 - blue;
-                        // console.log('blue:', blue, ', green:', green);
                         contextstyle = (blue < 0.1 ? `border: 2px solid rgb(0, 255, 0,0.25);` : `border: 2px solid rgb(0, 0, 255,${blue});`);
                         percentText = `
                         <div style="font-size:10px; color:blue; position:absolute; font-weight:900; bottom:1px; left:1px;">
@@ -120,9 +139,6 @@ export default {
                     }
                     else if (deal.deal_amount > dealProvious.deal_amount) {
                         let red = 2 * (deal.deal_amount / dealProvious.deal_amount < 1.5 ? deal.deal_amount / dealProvious.deal_amount - 1 : 0.5);
-                        // red = 105 + parseInt(150 * red);
-                        // const green = 255 - red;
-                        // console.log('red:', red, ', green:', green);
                         contextstyle = (red < 0.1 ? `border: 2px solid rgb(0, 255, 0,0.25);` : `border: 2px solid rgb(255, 0, 0,${red});`);
                         percentText = `
                         <div style="font-size:10px; color:red; position:absolute; font-weight:900; bottom:1px; left:1px;">
@@ -132,7 +148,46 @@ export default {
                     }
                     dealProviousIndex++;
                 }
-                let contentText = `
+                //locationFixed로 지역 거래정보 검색이 고정되었을 경우, 화면 밖의 거래정보들에 대한 핸들링
+                if (this.locationFixed && (mapBounds.min.x > deal.x || mapBounds.min.y > deal.y || mapBounds.max.x < deal.x || mapBounds.max.y < deal.y)) {
+                    return;
+                }
+                this.setTextMarkers(deal, contextstyle, percentText, index, markersDivList, mapBounds)
+            })
+
+            Promise.all(promises)
+                .then(() => {
+                    this.visibleMarkersCount = markersDivList.length;
+                    this.map.mapPane.view.panes.overlayImage.innerHTML += markersDivList.join('');
+                    this.$store.dispatch('dealList/setVisibleDealsIndex', visibleList);
+                    this.$store.dispatch('dealList/refreshList');
+                    console.log('visibleList:', visibleList.length, 'visibleMarkers:', markersDivList.length)
+                });
+
+
+        },
+        setTextMarkers(deal, contextstyle, percentText, index, markersDivList, mapBounds) {
+            const offset = this.map.mapPane.view.panes.overlayImage.parentElement.parentElement.style;
+            let positionX = parseInt(this.map.size.width * ((deal.x - mapBounds.min.x) / (mapBounds.max.x - mapBounds.min.x))) - parseInt(offset.left);
+            let positionY = parseInt(this.map.size.height * ((mapBounds.max.y - deal.y) / (mapBounds.max.y - mapBounds.min.y))) - parseInt(offset.top);
+            const contentText = `
+                <div title="" style="position: absolute; overflow: visible; box-sizing: content-box !important; cursor: inherit; left: ${positionX}px; top: ${positionY}px;">
+                    <div style="cursor: pointer;">
+                        <div class="marker" style="${contextstyle}" onclick='dealDetail(${index})'>
+                            <div style="font-size:15px; position:absolute; top:2px; font-weight:900; left:2px;">
+                            ${this.setAmount(deal.deal_amount)}
+                            </div>
+                            <div style="font-size:10px; position:absolute; font-weight:900; bottom:1px; right:1px;">
+                            ${Math.round(deal.area)}㎡<>
+                            </div>
+                            ${percentText}
+                        </div>
+                    </div>
+                </div>`;
+            markersDivList.push(contentText);
+        },
+        setMarkers(deal, contextstyle, percentText, index) {
+            let contentText = `
                         <div class="marker" style="${contextstyle}" onclick='dealDetail(${index})'>
                             <div style="font-size:15px; position:absolute; top:2px; font-weight:900; left:2px;">
                             ${this.setAmount(deal.deal_amount)}
@@ -143,25 +198,15 @@ export default {
                             ${percentText}
                         </div>
                        `;
-                this.markers.push(new naver.maps.Marker({
-                    position: new naver.maps.LatLng(deal.y, deal.x),
-                    map: this.map,
-                    icon: {
-                        content: contentText,
-                        //size: new naver.maps.Size(22, 35),
-                        //anchor: new naver.maps.Point(11, 35)
-                    }
-                }));
-            })
-
-            Promise.all(promises)
-                .then(() => {
-                    this.$store.dispatch('dealList/setVisibleDealsIndex', visibleList);
-                    this.$store.dispatch('dealList/refreshList');
-                    console.log('visibleList:', this.markers.length)
-                });
-
-
+            this.markers.push(new naver.maps.Marker({
+                position: new naver.maps.LatLng(deal.y, deal.x),
+                map: this.map,
+                icon: {
+                    content: contentText,
+                    //size: new naver.maps.Size(22, 35),
+                    //anchor: new naver.maps.Point(11, 35)
+                }
+            }));
         },
         dealDetail(dealIndex) {
             const deal = this.dealList[dealIndex];
@@ -172,15 +217,13 @@ export default {
                 }
             }
         },
-        removeMarker() {
-            this.markers.forEach((marker) => {
-                marker.setMap(null);
-                marker = null;
-            })
-            this.markers = [];
+        removeMarker(visibleMarkersCountLimit = 0) {
+            if (this.map.mapPane.view.panes.overlayImage.innerHTML != '' && visibleMarkersCountLimit < this.visibleMarkersCount) {
+                this.map.mapPane.view.panes.overlayImage.innerHTML = '';
+            }
         },
         getMapState() {
-            if (!this.pause && !this.locationFixed) {
+            if (!this.pause) {
                 this.pause = true;
                 let map = this.map;
                 let oldPoint = { x: map.getCenter().x, y: map.getCenter().y };
@@ -191,19 +234,24 @@ export default {
 
             let newPoint = { x: this.map.getCenter().x, y: this.map.getCenter().y };
             if (oldPoint.x == newPoint.x && oldPoint.y == newPoint.y) {
-                this.removeMarker();
-                this.$store.dispatch('dealList/setDeals', {
-                    point: { x: map.getCenter().x, y: map.getCenter().y },
-                    bounds: { max: map.getBounds()._max, min: map.getBounds()._min },
-                    Zoom: map.getZoom(),
-                }).then(() => {
-                    setTimeout(() => {
-                        this.pause = false;
-                        if (this.mapState.point.x != map.getCenter().x || this.mapState.point.y != map.getCenter().y) {
-                            this.getMapState();
-                        }
-                    }, 500)
-                })
+                //지도의 중앙이 변경을 감지 후 locationFixed에 따라 mapState의 갱신 여부를 스킵
+                if (!this.locationFixed) {
+                    this.$store.dispatch('dealList/setDeals', {
+                        point: { x: map.getCenter().x, y: map.getCenter().y },
+                        bounds: { max: map.getBounds()._max, min: map.getBounds()._min },
+                        Zoom: map.getZoom(),
+                    }).then(() => {
+                        setTimeout(() => {
+                            this.pause = false;
+                            if (this.mapState.point.x != map.getCenter().x || this.mapState.point.y != map.getCenter().y) {
+                                this.getMapState();
+                            }
+                        }, 500)
+                    })
+                } else {
+                    this.setMarker(this.dealList, this.options);
+                    this.pause = false;
+                }
 
             } else {
                 setTimeout(this.delaySetMapState, 400, map, newPoint);
@@ -236,12 +284,13 @@ export default {
         let map = null
         var zoom_label = this.zoom_label;
 
-        initMap(zoom_label, this.getMapState);
+        initMap(zoom_label, this.controller);
         this.map = map;
+        window.map = map;
 
         window.dealDetail = this.dealDetail;
 
-        function initMap(zoom_label, getMapState) {
+        function initMap(zoom_label, controller) {
             map = new naver.maps.Map(document.getElementById('naverMap'), {
                 center: new naver.maps.LatLng(37.5666103, 126.9783882),
                 zoom: zoom_label,
@@ -251,9 +300,11 @@ export default {
             });
 
             naver.maps.Event.addListener(map, "center_changed", function () {
-                window.setTimeout(function () {
-                    getMapState();
-                }, 100);
+                controller("center_changed");
+            });
+
+            naver.maps.Event.addListener(map, "zoom_changed", function () {
+                controller("zoom_changed");
             });
 
         } // end_mount
