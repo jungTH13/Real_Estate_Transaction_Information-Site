@@ -123,7 +123,6 @@ export default {
                 let positionY = parseInt(this.map.size.height * ((mapBounds.max.y - deal.y) / (mapBounds.max.y - mapBounds.min.y)));
                 const offset = { x: positionX - parseInt(position.left), y: positionY - parseInt(position.top) };
                 marker.setMap(null);
-                console.log(offset);
                 return offset
             }
         },
