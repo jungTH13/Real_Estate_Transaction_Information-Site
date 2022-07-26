@@ -2,7 +2,7 @@
     <div id='wrap' class='section'>
         <div id="naverMap">
             <v-card v-if="mapState && mapState.Zoom < 14"
-                style="position:absolute; font-weight:900; font-family=red; left:35%; top:130px; z-index: 100; background-color: #ffffff44; border: 1px solid rgb(255, 0, 0);">
+                style="position:absolute; font-weight:900; font-family=red; left:80px; top:115px; z-index: 100; background-color: #ffffff44; border: 1px solid rgb(255, 0, 0);">
                 지도가 너무 축소되어 있습니다. 확대해주세요!
             </v-card>
         </div>
