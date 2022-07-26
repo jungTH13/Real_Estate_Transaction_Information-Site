@@ -66,7 +66,7 @@ export default {
     methods: {
         controller(type) {
             if (type === "center_changed") {
-                this.removeMarker(500);
+                this.removeMarker(300);
                 window.setTimeout(() => {
                     this.getMapState();
                 }, 100);
@@ -91,6 +91,22 @@ export default {
             }
             return result
         },
+        async setOffset(deal, mapBounds) {
+            if (deal) {
+                let marker = await new naver.maps.Marker({
+                    position: new naver.maps.LatLng(deal.y, deal.x),
+                    map: this.map
+                })
+                const position = this.map.mapPane.view.panes.overlayImage.children[0].style
+
+                let positionX = parseInt(this.map.size.width * ((deal.x - mapBounds.min.x) / (mapBounds.max.x - mapBounds.min.x)));
+                let positionY = parseInt(this.map.size.height * ((mapBounds.max.y - deal.y) / (mapBounds.max.y - mapBounds.min.y)));
+                const offset = { x: positionX - parseInt(position.left), y: positionY - parseInt(position.top) };
+                marker.setMap(null);
+                console.log(offset);
+                return offset
+            }
+        },
         async setMarker(dealList, options = null) {
             let visibleList = [];
             let dealProviousIndex = 0;
@@ -98,6 +114,7 @@ export default {
             let markersDivList = [];
             const mapBounds = { min: this.map.bounds._min, max: this.map.bounds._max };
             this.removeMarker();
+            const offset = await this.setOffset(dealList[0], mapBounds);
 
             const promises = dealList.map((deal, index) => {
                 //groupSet component에서 설정된 설정값에 따른 핸들링
@@ -152,7 +169,7 @@ export default {
                 if (this.locationFixed && (mapBounds.min.x > deal.x || mapBounds.min.y > deal.y || mapBounds.max.x < deal.x || mapBounds.max.y < deal.y)) {
                     return;
                 }
-                this.setTextMarkers(deal, contextstyle, percentText, index, markersDivList, mapBounds)
+                this.setTextMarkers(deal, contextstyle, percentText, index, markersDivList, mapBounds, offset)
             })
 
             Promise.all(promises)
@@ -166,10 +183,9 @@ export default {
 
 
         },
-        setTextMarkers(deal, contextstyle, percentText, index, markersDivList, mapBounds) {
-            const offset = this.map.mapPane.view.panes.overlayImage.parentElement.parentElement.style;
-            let positionX = parseInt(this.map.size.width * ((deal.x - mapBounds.min.x) / (mapBounds.max.x - mapBounds.min.x))) - parseInt(offset.left);
-            let positionY = parseInt(this.map.size.height * ((mapBounds.max.y - deal.y) / (mapBounds.max.y - mapBounds.min.y))) - parseInt(offset.top);
+        setTextMarkers(deal, contextstyle, percentText, index, markersDivList, mapBounds, offset) {
+            let positionX = parseInt(this.map.size.width * ((deal.x - mapBounds.min.x) / (mapBounds.max.x - mapBounds.min.x))) - offset.x;
+            let positionY = parseInt(this.map.size.height * ((mapBounds.max.y - deal.y) / (mapBounds.max.y - mapBounds.min.y))) - offset.y;
             const contentText = `
                 <div title="" style="position: absolute; overflow: visible; box-sizing: content-box !important; cursor: inherit; left: ${positionX}px; top: ${positionY}px;">
                     <div style="cursor: pointer;">
@@ -178,7 +194,7 @@ export default {
                             ${this.setAmount(deal.deal_amount)}
                             </div>
                             <div style="font-size:10px; position:absolute; font-weight:900; bottom:1px; right:1px;">
-                            ${Math.round(deal.area)}㎡<>
+                            ${Math.round(deal.area)}㎡
                             </div>
                             ${percentText}
                         </div>
