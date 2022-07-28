@@ -48,7 +48,7 @@ Real_Estate_Transaction_Information-Site
 
 
 ## 제어 흐름
-![image](https://user-images.githubusercontent.com/87050915/181424038-99c87378-2ea4-4dbd-a530-0b19620b718c.png)
+![image](https://user-images.githubusercontent.com/87050915/181430219-c1cd6c87-cadd-406b-a48a-6c265df82b36.png)
 
 
 ## 주요 기능
