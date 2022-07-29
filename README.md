@@ -55,14 +55,22 @@ Real_Estate_Transaction_Information-Site
 - 하루에 한번씩 도로교통부 부도상 실거래 API로 데이터를 요청하여 데이터베이스의 정보를 자동으로 업데이트 합니다.
 ![image](https://user-images.githubusercontent.com/87050915/181425944-b1d79194-f544-46e3-a9c4-e39b990808ed.png)
 
+<br/>
+
 - 거래정보를 시각화하는데 있어서 마커의 수가 몇천개까지도 부드럽게 표시되어 지역 전체의 상세 정보를 확인 할 수 있습니다.
 ![image](https://user-images.githubusercontent.com/87050915/181424567-0261a3b6-478a-47a7-bbf7-f50c0ee9c089.png)
+
+<br/>
 
 - 원하는 지역의 변동율만을 시각화 할 수 있으며 화면에 표시된 지역내에서의 거래량 및 평당 평균매매가 흐름을 확인 할 수 있습니다.
 ![image](https://user-images.githubusercontent.com/87050915/181424971-100322b3-0646-4c80-b77e-f0b723c56369.png)
 
+<br/>
+
 - 사용자가 원하는 특정 구 혹은 동을 지정하여 해당 지역의 전체 정보를 조회 가능합니다.
 ![image](https://user-images.githubusercontent.com/87050915/181425376-5e7b2369-4112-409b-96dd-02b6b6722e4b.png)
+
+<br/>
 
 
 ## 중요 이슈
