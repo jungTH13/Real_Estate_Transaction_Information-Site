@@ -19,6 +19,11 @@ URL: http://ec2-3-36-175-42.ap-northeast-2.compute.amazonaws.com/
 
 
 ## 프로젝트 아키텍처 상세
+<p>
+<img src="https://img.shields.io/badge/Express-%23404d59?style=flat-square&logo=Express&logoColor=white"/>&nbsp
+<img src="https://img.shields.io/badge/Vue-%2335495e.svg?style=flat-square&logo=vuedotjs&logoColor=%234FC08D"/>&nbsp
+</p>
+
 ```
 Real_Estate_Transaction_Information-Site
  └ back                                →→→ server 폴더
